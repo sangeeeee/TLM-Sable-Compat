@@ -14,6 +14,15 @@
 | Maidsoul Kitchen | 1.21.1-beta-v0.1.4 | [Modrinth](https://modrinth.com/mod/maidsoul-kitchen/version/JvPRj6e1) |
 | Farmer's Delight | 1.21.1-1.3.4 | [Modrinth](https://modrinth.com/mod/farmers-delight/version/XTVZDOol) |
 | Barbeque's Delight | 1.3.0 | [CurseForge](https://www.curseforge.com/minecraft/mc-mods/barbeques-delight/files/8004721) |
+| Maid Tavern | 1.2.0-neoforge+mc1.21.1 | [Modrinth](https://modrinth.com/mod/maid-tavern/version/L7NA2k7R) |
+| Maid Restaurant | 0.2.9 | [Modrinth](https://modrinth.com/mod/maid-restaurant/version/vEgMAYm3) |
+| Maid Useful Tasks | 1.4.2 | [CurseForge](https://www.curseforge.com/minecraft/mc-mods/maid-useful-tasks/files/7909120) |
+| TLM Maid Manager | 1.0.3-beta2 | [CurseForge](https://www.curseforge.com/minecraft/mc-mods/touhou-little-maid-maid-manager/files/8712327) |
+| Maid Storage Manager | 1.15.6 | [CurseForge](https://www.curseforge.com/minecraft/mc-mods/maid-storage-manager/files/7976865) |
+| Maid Please Help Me Forge | 0.1.3 | [CurseForge](https://www.curseforge.com/minecraft/mc-mods/maid-please-help-me-forge/files/7588086) |
+| Maid Restaurant Storage | 0.3.2-fix+neoforge-1.21.1 | [Modrinth](https://modrinth.com/mod/maid-restaruant-storage/version/N2ribxx0) |
+| TerraFirmaCraft（Maid Please Help Me Forge 必需前置） | 4.2.10 | [CurseForge](https://www.curseforge.com/minecraft/mc-mods/terrafirmacraft/files/8831715) |
+| Patchouli（TerraFirmaCraft 必需前置） | 1.21.1-93-neoforge | [Modrinth](https://modrinth.com/mod/patchouli/version/BIogJv2D) |
 
 `gradle.properties` 固定发布 ID；`build.gradle` 使用 `compatCompileOnly` 配置扩展 `compileOnly`。不依赖本机整合包路径，不加入默认运行依赖，不打包进本模组，也不新增安装时的强制依赖声明。
 
@@ -27,7 +36,7 @@
 
 Maidsoul Kitchen 和 Barbeque's Delight 也内附 Registrate `MC1.21-1.3.0+67`，其 SHA-256 与 Create 内附副本一致；提取时按文件名去重，只加入一份。上述内嵌库已检查，没有进一步的嵌套 JAR。
 
-Maidsoul Kitchen 的必需前置车万女仆已由基础依赖提供；Barbeque's Delight 的农夫乐事前置由本表提供。三个新模组及 L2 库都仅用于编译。
+Maidsoul Kitchen、Maid Tavern、Maid Restaurant、Maid Useful Tasks、TLM Maid Manager、Maid Storage Manager 和 Maid Restaurant Storage 所需的车万女仆已由基础依赖提供。Maid Tavern 与 Maid Restaurant 分别复用表中的 Kaleidoscope Tavern 与 Kaleidoscope Cookery；Maid Restaurant Storage 复用 Maid Restaurant。Barbeque's Delight 的 Farmer's Delight 前置，以及 Maid Please Help Me Forge 的 TerraFirmaCraft 与 Patchouli 前置均由本表显式提供。它们都仅用于编译。
 
 必需前置车万女仆，以及 Minecraft、NeoForge 已由现有基础依赖提供，不重复声明。根据所选版本的发布元数据和 JAR 依赖声明，厨房、酒馆、节气没有其他必装独立模组；JEI、KubeJS、Create Connected 等可选联动不属于本次前置范围。
 

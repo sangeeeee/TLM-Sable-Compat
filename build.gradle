@@ -173,6 +173,16 @@ dependencies {
     compatCompileOnly "maven.modrinth:maidsoul-kitchen:${maidsoul_kitchen_modrinth_version_id}"
     compatCompileOnly "maven.modrinth:farmers-delight:${farmers_delight_modrinth_version_id}"
     compatCompileOnly "curse.maven:barbeques-delight-1007788:${barbeques_delight_curse_file_id}"
+    compatCompileOnly "maven.modrinth:maid-tavern:${maid_tavern_modrinth_version_id}"
+    compatCompileOnly "maven.modrinth:maid-restaurant:${maid_restaurant_modrinth_version_id}"
+    compatCompileOnly "curse.maven:maid-useful-tasks-1255424:${maid_useful_tasks_curse_file_id}"
+    compatCompileOnly "curse.maven:touhou-little-maid-maid-manager-1645806:${maid_manager_curse_file_id}"
+    compatCompileOnly "curse.maven:maid-storage-manager-1210244:${maid_storage_manager_curse_file_id}"
+    compatCompileOnly "curse.maven:maid-please-help-me-forge-1399077:${maid_please_help_me_forge_curse_file_id}"
+    compatCompileOnly "maven.modrinth:maid-restaruant-storage:${maid_restaurant_storage_modrinth_version_id}"
+    // Maid Please Help Me Forge requires TFC; TFC in turn requires Patchouli.
+    compatCompileOnly "curse.maven:terrafirmacraft-302973:${terrafirmacraft_curse_file_id}"
+    compatCompileOnly "maven.modrinth:patchouli:${patchouli_modrinth_version_id}"
     compileOnly fileTree(layout.buildDirectory.dir('compat-api')) { include '*.jar' }.builtBy(extractCompatApis)
     // Optional regression profile, using user-supplied MUHC and Create jars (never bundled).
     if (providers.gradleProperty('muhcTestJar').isPresent()) {
