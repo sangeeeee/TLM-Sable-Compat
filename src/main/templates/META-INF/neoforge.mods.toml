@@ -9,7 +9,6 @@ displayName="${mod_name}"
 authors="Sange"
 description='''
 Compatibility support between Touhou Little Maid and Sable.
-为车万女仆（Touhou Little Maid）与 Sable 提供兼容支持。
 '''
 
 [[dependencies.${mod_id}]]
