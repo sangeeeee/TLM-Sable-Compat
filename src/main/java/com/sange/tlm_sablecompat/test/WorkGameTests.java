@@ -27,7 +27,7 @@ import java.util.concurrent.atomic.AtomicBoolean;
 
 @PrefixGameTestTemplate(false)
 public class WorkGameTests {
-    private static Object invoke(Object obj,String method,Class<?>[] signature,Object...args) throws ReflectiveOperationException {
+    static Object invoke(Object obj,String method,Class<?>[] signature,Object...args) throws ReflectiveOperationException {
         for (Class<?> type=obj.getClass(); type!=null; type=type.getSuperclass()) {
             try {
                 var m=type.getDeclaredMethod(method,signature);m.setAccessible(true);return m.invoke(obj,args);

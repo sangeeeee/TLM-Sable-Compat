@@ -19,6 +19,7 @@ public final class TLMSableCompat {
             modBus.addListener((net.neoforged.neoforge.event.RegisterGameTestsEvent event) -> {
                 event.register(com.sange.tlm_sablecompat.test.CompatGameTests.class);
                 event.register(com.sange.tlm_sablecompat.test.WorkGameTests.class);
+                event.register(com.sange.tlm_sablecompat.test.FishingGameTests.class);
                 if (net.neoforged.fml.ModList.get().isLoaded("muhc"))
                     event.register(com.sange.tlm_sablecompat.test.HandCrankGameTests.class);
             });
