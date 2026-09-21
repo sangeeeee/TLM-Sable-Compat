@@ -6,6 +6,7 @@ license="${mod_license}"
 modId="${mod_id}"
 version="${mod_version}"
 displayName="${mod_name}"
+logoFile="assets/tlm_sablecompat/icon.png"
 authors="Sange"
 description='''
 Compatibility support between Touhou Little Maid and Sable.
