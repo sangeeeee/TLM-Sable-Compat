@@ -33,6 +33,57 @@ public class AddonGameTests {
     }
     static void target(EntityMaid m,BlockPos p) { m.getBrain().setMemory(InitEntities.TARGET_POS.get(),new BlockPosTracker(p)); }
 
+    private static void interruptedBoard(GameTestHelper h,boolean structure) throws ReflectiveOperationException {
+        var s=structure ? CompatGameTests.platform(h,1) : null;
+        var m=structure ? CompatGameTests.maid(h,s) : new EntityMaid(h.getLevel());
+        BlockPos feet=structure ? s.getPlot().getCenterBlock().offset(3,1,3) : h.absolutePos(new BlockPos(3,3,3));
+        if(!structure) {
+            for(BlockPos p:BlockPos.betweenClosed(feet.offset(-2,-1,-2),feet.offset(2,-1,2))) put(h,p,"minecraft:stone");
+            m.setPos(Vec3.atBottomCenterOf(feet)); h.getLevel().addFreshEntity(m);
+        }
+        home(m);
+        BlockPos pos=feet.east();put(h,pos,"kaleidoscope_cookery:chopping_board");
+        if(structure) { s.logicalPose().position().add(20,0,10);s.logicalPose().orientation().rotateY(.8).rotateX(.06); }
+        m.setPos(Spaces.world(s,Vec3.atBottomCenterOf(feet)).add(0,.04,0));m.setOnGround(true);
+        var task=TaskManager.findTask(id("kaleidoscope_compat:chopping_board")).orElseThrow();m.setTask(task);
+        var behavior=task.createBrainTasks(m).getFirst().getSecond();
+        var knife=new ItemStack(BuiltInRegistries.ITEM.get(id("kaleidoscope_cookery:iron_kitchen_knife")));
+        m.setItemInHand(InteractionHand.MAIN_HAND,knife);
+        m.getMaidInv().setStackInSlot(0,new ItemStack(Items.COD));
+        h.assertTrue((boolean)call(behavior,"checkExtraStartConditions",h,m,false),"Start actual chopping behavior; allowed="+Work.blockAllowed(m,pos)+", interact="+AddonWork.canInteract(m,pos,1)+", visible="+AddonWork.visible(m,pos)+", range="+AddonWork.boardRange(AddonWork.position(m),pos)+", feet="+Spaces.localPosition(m)+", stand="+feet+", board="+pos);
+        call(behavior,"start",h,m,true);call(behavior,"tick",h,m,true);
+        var board=(com.github.ysbbbbbb.kaleidoscopecookery.blockentity.kitchen.ChoppingBoardBlockEntity)h.getLevel().getBlockEntity(pos);
+        for(int i=0;i<12;i++) call(behavior,"tick",h,m,true);
+        h.assertTrue(board.getCurrentCutCount()==2 && board.getMaxCutCount()==4,"Interrupt real recipe at two of four cuts");
+        call(behavior,"stop",h,m,true);
+        m.setItemInHand(InteractionHand.MAIN_HAND,ItemStack.EMPTY);
+        // A new task instance must infer the board state, including after task switching/reloading.
+        behavior=task.createBrainTasks(m).getFirst().getSecond();
+        h.assertTrue((boolean)call(behavior,"checkExtraStartConditions",h,m,false),"Rediscover unfinished board with no spare ingredient");
+        call(behavior,"start",h,m,true);
+        for(int i=0;i<20;i++) call(behavior,"tick",h,m,true);
+        h.assertTrue(board.getCurrentCutCount()==2,"No knife must not advance or clear the unfinished recipe");
+        m.getMaidInv().setStackInSlot(1,knife);
+        call(behavior,"tick",h,m,true);
+        h.assertTrue(board.getCurrentCutCount()==3,"Resume with a knife from the inventory, preserving two previous cuts");
+        call(behavior,"tick",h,m,true);
+        h.assertTrue(board.getCurrentCutCount()==3,"Resumption must retain the normal cutting interval");
+        for(int i=0;i<30;i++) call(behavior,"tick",h,m,true);
+        h.assertTrue(board.getCurrentCutStack().isEmpty(),"Interrupted recipe must finish without clearing/replacing the board");
+        int produced=0;
+        for(var e:h.getLevel().getAllEntities()) if(e instanceof net.minecraft.world.entity.item.ItemEntity item
+                && item.getItem().is(BuiltInRegistries.ITEM.get(id("kaleidoscope_cookery:sashimi")))
+                && (item.position().distanceToSqr(Spaces.world(s,pos.getCenter()))<16 || item.position().distanceToSqr(pos.getCenter())<16)) {
+            produced+=item.getItem().getCount(); item.discard();
+        }
+        h.assertTrue(produced==2,"Exactly one cod must produce exactly two sashimi, without duplication");
+        m.discard();if(s!=null) CompatGameTests.cleanup(h,s);h.succeed();
+    }
+    @GameTest(templateNamespace="tlm_sablecompat",template="empty",batch="interrupted_board")
+    public static void interruptedBoardInWorld(GameTestHelper h) throws ReflectiveOperationException { interruptedBoard(h,false); }
+    @GameTest(templateNamespace="tlm_sablecompat",template="empty",batch="interrupted_board")
+    public static void interruptedBoardOnStructure(GameTestHelper h) throws ReflectiveOperationException { interruptedBoard(h,true); }
+
     private static void raisedBoards(GameTestHelper h,boolean structure) throws ReflectiveOperationException {
         var s=structure ? CompatGameTests.platform(h,1) : null;
         var m=structure ? CompatGameTests.maid(h,s) : new EntityMaid(h.getLevel());

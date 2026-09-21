@@ -72,6 +72,7 @@ public final class Navigation {
         return Spaces.tracking(m) != null || st.leftAt >= 0 && m.level().getGameTime() - st.leftAt >= 10;
     }
     public static void clearMovement(EntityMaid m) {
+        LocalAvoidance.clear(m);
         m.getNavigation().stop();
         m.getBrain().eraseMemory(MemoryModuleType.WALK_TARGET);
         m.getBrain().eraseMemory(MemoryModuleType.PATH);

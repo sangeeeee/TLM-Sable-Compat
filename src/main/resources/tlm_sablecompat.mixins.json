@@ -5,7 +5,7 @@
   "compatibilityLevel": "JAVA_21",
   "mixins": [
     "AssemblyMixin", "ContainerMixin", "CompassMixin", "HomeConfigMixin",
-    "ScheduleMixin", "MaidMixin", "FollowMixin", "MoveSinkMixin", "NodeEvaluatorMixin",
+    "ScheduleMixin", "MaidMixin", "FollowMixin", "MoveSinkMixin", "NodeEvaluatorMixin", "NavigationRecoveryMixin",
     "BfsMixin", "WorkSearchMixin", "VehicleFollowMixin", "LookControlMixin", "HandCrankSearchMixin",
     "BlockArrivalMixin", "PoiTasksMixin", "JoyTaskMixin", "SeatMixin", "SleepMixin", "BedPositionMixin", "EntitySensorMixin", "RangedWalkMixin",
     "FishingTaskMixin", "FishingHookMixin", "PickupTaskMixin", "PickupSensorMixin", "PickupMixin",

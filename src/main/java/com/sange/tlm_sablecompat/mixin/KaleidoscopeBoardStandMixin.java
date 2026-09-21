@@ -3,6 +3,7 @@ package com.sange.tlm_sablecompat.mixin;
 import com.github.tartaricacid.touhoulittlemaid.entity.passive.EntityMaid;
 import com.github.tartaricacid.touhoulittlemaid.entity.passive.MaidPathFindingBFS;
 import com.github.ysbbbbbb.kaleidoscopecookery.api.blockentity.IChoppingBoard;
+import com.github.ysbbbbbb.kaleidoscopecookery.blockentity.kitchen.ChoppingBoardBlockEntity;
 import com.sange.tlm_sablecompat.*;
 import net.minecraft.core.BlockPos;
 import net.minecraft.server.level.ServerLevel;
@@ -19,6 +20,7 @@ public abstract class KaleidoscopeBoardStandMixin {
     @Shadow private BlockPos standPos;
     @Shadow private boolean hasReached;
     @Shadow private int actionStage;
+    @Shadow private int failCount;
     @Shadow @Final private float movementSpeed;
     @Shadow private void tryPutItem(ServerLevel level,EntityMaid m,IChoppingBoard board) { throw new AssertionError(); }
     @Shadow private void tryCut(ServerLevel level,EntityMaid m,IChoppingBoard board) { throw new AssertionError(); }
@@ -60,6 +62,14 @@ public abstract class KaleidoscopeBoardStandMixin {
         hasReached=true;m.getNavigation().stop();m.getBrain().eraseMemory(MemoryModuleType.WALK_TARGET);
         if (!(level.getBlockEntity(currentWorkPos) instanceof IChoppingBoard board)) return;
         m.getLookControl().setLookAt(currentWorkPos.getCenter());
+        // start() resets the task, not the board. A partly cut ingredient cannot be
+        // replaced or taken out; resume the normal knife/timer-controlled cutting stage.
+        if (actionStage == 0 && board instanceof ChoppingBoardBlockEntity chopping
+                && !chopping.getCurrentCutStack().isEmpty()
+                && chopping.getCurrentCutCount() < chopping.getMaxCutCount()) {
+            actionStage = 1;
+            failCount = 0;
+        }
         switch(actionStage) {
             case 0 -> tryPutItem(level,m,board);
             case 1 -> tryCut(level,m,board);
