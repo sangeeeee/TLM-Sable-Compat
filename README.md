@@ -93,8 +93,9 @@ Sable 将飞艇等可移动物理结构保存在独立空间中。方块使用�
 | Maidsoul Kitchen + [Ecliptic Seasons](https://modrinth.com/mod/ecliptic-seasons) | 节气农场任务 |
 | [Ecliptic Seasons: MultiMod Patch](https://www.curseforge.com/minecraft/mc-mods/ecliptic-seasons-multimod-patch) | 节气扫雪任务 |
 | [Maid Tavern](https://modrinth.com/mod/maid-tavern) | 葡萄收获；酿酒的箱子取料、酒桶投料、放瓶接酒、收瓶、成品和副产物入库 |
+| [Touhou Little Maid: Maid Manager](https://www.curseforge.com/minecraft/mc-mods/touhou-little-maid-maid-manager) | 管理界面与精确日程的锚点派遣；移动结构安全落点、局部 Home、装配/分裂地址更新与跨维度传送 |
 
-公共适配也可能让其他附属任务直接可用，但只有上表任务完成了源码核对和专门服务器测试。详细清单见 [附属任务兼容](docs/addon-task-compatibility.md) 和 [Maid Tavern 兼容](docs/maid-tavern-compatibility.md)。
+公共适配也可能让其他附属任务直接可用，但只有上表任务完成了源码核对和专门服务器测试。详细清单见 [附属任务兼容](docs/addon-task-compatibility.md)、[Maid Tavern 兼容](docs/maid-tavern-compatibility.md) 和 [Maid Manager 锚点兼容](docs/maid-manager-compatibility.md)。锚点派遣会保留同空间的有效罗盘活动区；罗盘属于另一空间时，需要先清除或重新绑定。
 
 ## 未来计划
 
@@ -102,7 +103,6 @@ Sable 将飞艇等可移动物理结构保存在独立空间中。方块使用�
 
 - [Maid Restaurant](https://modrinth.com/mod/maid-restaurant)
 - [Maid Useful Tasks](https://www.curseforge.com/minecraft/mc-mods/maid-useful-tasks)
-- [Touhou Little Maid: Maid Manager](https://www.curseforge.com/minecraft/mc-mods/touhou-little-maid-maid-manager)
 - [Maid Storage Manager](https://www.curseforge.com/minecraft/mc-mods/maid-storage-manager)
 - [Maid Please Help Me Forge](https://www.curseforge.com/minecraft/mc-mods/maid-please-help-me-forge)
 - [Maid Restaurant Storage](https://www.curseforge.com/minecraft/mc-mods/maid-restaurant-storage)
@@ -225,8 +225,9 @@ Specifically supported optional mods:
 | Maidsoul Kitchen + [Ecliptic Seasons](https://modrinth.com/mod/ecliptic-seasons) | Seasonal farm task |
 | [Ecliptic Seasons: MultiMod Patch](https://www.curseforge.com/minecraft/mc-mods/ecliptic-seasons-multimod-patch) | Seasonal snow-clearing task |
 | [Maid Tavern](https://modrinth.com/mod/maid-tavern) | Grape harvesting; brewing storage, barrel loading, bottle filling/collection, and result/byproduct storage |
+| [Touhou Little Maid: Maid Manager](https://www.curseforge.com/minecraft/mc-mods/touhou-little-maid-maid-manager) | UI and precise-schedule anchor dispatch, safe landings, local Home, assembly/split address updates, and cross-dimension transfers |
 
-Common adapters may help other tasks, but only those listed above have dedicated source review and server tests. See [add-on task compatibility](docs/addon-task-compatibility.md) and [Maid Tavern compatibility](docs/maid-tavern-compatibility.md).
+Common adapters may help other tasks, but only those listed above have dedicated source review and server tests. See [add-on task compatibility](docs/addon-task-compatibility.md), [Maid Tavern compatibility](docs/maid-tavern-compatibility.md), and [Maid Manager anchor compatibility](docs/maid-manager-compatibility.md). Anchor dispatch preserves valid compass areas in the same space; clear or rebind areas assigned to another space before dispatching.
 
 ## Planned compatibility
 
@@ -234,7 +235,6 @@ These mods are compile-only development dependencies for analysis and future imp
 
 - [Maid Restaurant](https://modrinth.com/mod/maid-restaurant)
 - [Maid Useful Tasks](https://www.curseforge.com/minecraft/mc-mods/maid-useful-tasks)
-- [Touhou Little Maid: Maid Manager](https://www.curseforge.com/minecraft/mc-mods/touhou-little-maid-maid-manager)
 - [Maid Storage Manager](https://www.curseforge.com/minecraft/mc-mods/maid-storage-manager)
 - [Maid Please Help Me Forge](https://www.curseforge.com/minecraft/mc-mods/maid-please-help-me-forge)
 - [Maid Restaurant Storage](https://www.curseforge.com/minecraft/mc-mods/maid-restaurant-storage)

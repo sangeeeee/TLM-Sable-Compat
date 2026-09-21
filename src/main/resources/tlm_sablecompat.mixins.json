@@ -12,7 +12,8 @@
     "KitchenSearchMixin", "KitchenCookSearchMixin", "KitchenArrivalMixin", "KitchenContinuousMixin", "KitchenContainersMixin", "KitchenBerryPathMixin",
     "SeasonSnowSearchMixin", "KaleidoscopeTaskMixin", "KaleidoscopeMotionMixin", "KaleidoscopeTubMixin", "KaleidoscopeBoardStandMixin", "MillstoneBindingMixin",
     "TavernApproachMixin", "TavernWorkMixin", "TavernStateMixin", "TavernPreTickMixin",
-    "TavernTargetsMixin", "TavernOperationMixin", "TavernIngredientsMixin", "TavernGrapeMixin"
+    "TavernTargetsMixin", "TavernOperationMixin", "TavernIngredientsMixin", "TavernGrapeMixin",
+    "ManagerSableMixin", "ManagerDispatchMixin", "ManagerTaskTeleportMixin", "ManagerWorkDataMixin", "ManagerAssemblyMixin"
   ],
   "injectors": { "defaultRequire": 1 }
 }

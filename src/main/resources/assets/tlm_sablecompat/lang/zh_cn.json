@@ -1,5 +1,9 @@
 {
   "message.tlm_sablecompat.empty": "罗盘尚未记录活动区域。",
+  "message.tlm_sablecompat.manager_anchor_missing": "锚点传送失败：锚点或所属结构不存在，或尚未加载。",
+  "message.tlm_sablecompat.manager_no_landing": "锚点传送失败：锚点附近没有安全落脚点。",
+  "message.tlm_sablecompat.manager_compass_conflict": "锚点传送失败：河童罗盘区域已失效或属于另一空间，请先清除或重新绑定。",
+  "message.tlm_sablecompat.manager_transfer_failed": "锚点传送失败：跨维度传送被拒绝。",
   "message.tlm_sablecompat.missing": "绑定记录不可用，请重新设置。",
   "message.tlm_sablecompat.dimension": "绑定失败：活动区域位于其他维度。",
   "message.tlm_sablecompat.removed": "原结构已被移除或收纳，绑定已失效，请重新设置。",

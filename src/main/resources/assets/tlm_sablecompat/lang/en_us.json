@@ -1,5 +1,9 @@
 {
   "message.tlm_sablecompat.empty": "No activity points recorded.",
+  "message.tlm_sablecompat.manager_anchor_missing": "Anchor teleport failed: the anchor or its structure is missing or not loaded.",
+  "message.tlm_sablecompat.manager_no_landing": "Anchor teleport failed: no safe landing near this anchor.",
+  "message.tlm_sablecompat.manager_compass_conflict": "Anchor teleport failed: the compass areas are invalid or in another space. Clear or rebind them first.",
+  "message.tlm_sablecompat.manager_transfer_failed": "Anchor teleport failed: dimension transfer was refused.",
   "message.tlm_sablecompat.missing": "Binding unavailable. Please configure again.",
   "message.tlm_sablecompat.dimension": "Binding failed: the areas are in another dimension.",
   "message.tlm_sablecompat.removed": "The structure was removed or stored. Please configure a new binding.",

@@ -190,6 +190,9 @@ dependencies {
         localRuntime "maven.modrinth:kaleidoscopetavern:${tavern_modrinth_version_id}"
         localRuntime "maven.modrinth:maid-tavern:${maid_tavern_modrinth_version_id}"
     }
+    if (providers.gradleProperty('managerTests').isPresent() && !providers.gradleProperty('addonTests').isPresent()) {
+        localRuntime "curse.maven:touhou-little-maid-maid-manager-1645806:${maid_manager_curse_file_id}"
+    }
     // Optional regression profile, using user-supplied MUHC and Create jars (never bundled).
     if (providers.gradleProperty('muhcTestJar').isPresent()) {
         localRuntime files(providers.gradleProperty('muhcTestJar').get())

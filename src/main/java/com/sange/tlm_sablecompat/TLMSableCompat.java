@@ -23,6 +23,8 @@ public final class TLMSableCompat {
                 event.register(com.sange.tlm_sablecompat.test.PickupGameTests.class);
                 event.register(com.sange.tlm_sablecompat.test.JoyGameTests.class);
                 event.register(com.sange.tlm_sablecompat.test.NavigationGameTests.class);
+                if (net.neoforged.fml.ModList.get().isLoaded("tlm_maid_manager"))
+                    event.register(com.sange.tlm_sablecompat.test.ManagerGameTests.class);
                 if (net.neoforged.fml.ModList.get().isLoaded("maidtavern"))
                     event.register(com.sange.tlm_sablecompat.test.TavernGameTests.class);
                 if (net.neoforged.fml.ModList.get().isLoaded("muhc"))

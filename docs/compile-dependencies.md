@@ -42,4 +42,6 @@ Maidsoul Kitchen、Maid Tavern、Maid Restaurant、Maid Useful Tasks、TLM Maid 
 
 既有 `muhcTestJar` / `createTestJar` 可选测试配置继续保留。另可显式使用 `-PaddonTests`，将本表依赖加入开发运行环境并注册附属任务 GameTest；默认构建仍全部仅编译，不打包、不要求玩家安装。不要同时传入两个测试配置，以免加载重复模组。
 
+Maid Manager 锚点兼容可使用 `-PmanagerTests` 单独加载管理器执行服务器测试；使用 `-PaddonTests` 时不会重复添加依赖。兼容范围见 [Maid Manager 锚点兼容](maid-manager-compatibility.md)。
+
 Kaleidoscope Compat 的 Patch JAR 没有嵌套库，且含有 Gradle ZIP 读取器拒绝的目录条目，因此不参与 `extractCompatApis`。原始 JAR 直接用于编译及可选测试运行，Java JAR 读取器可正常读取；不重新打包第三方模组。

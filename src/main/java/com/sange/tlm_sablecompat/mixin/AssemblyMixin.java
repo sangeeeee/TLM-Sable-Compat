@@ -16,5 +16,7 @@ public class AssemblyMixin {
                               Iterable<BlockPos> blocks, CallbackInfo ci) {
         var set = new HashSet<BlockPos>(); blocks.forEach(p -> set.add(p.immutable()));
         BindingStore.get(level).moved(level, transform, set);
+        if (net.neoforged.fml.ModList.get().isLoaded("tlm_maid_manager"))
+            com.sange.tlm_sablecompat.ManagerAnchors.moved(level, transform, set);
     }
 }

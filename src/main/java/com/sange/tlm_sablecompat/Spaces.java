@@ -53,7 +53,9 @@ public final class Spaces {
     }
     /** Full target box check against the world AND every intersecting structure, using current poses. */
     public static boolean clear(EntityMaid maid, AABB box) {
-        Level level = maid.level();
+        return clear(maid, maid.level(), box);
+    }
+    public static boolean clear(EntityMaid maid, Level level, AABB box) {
         if (!level.getWorldBorder().isWithinBounds(box) || !level.noCollision(maid, box)) return false;
         var container = SubLevelContainer.getContainer(level);
         if (container == null) return true;
@@ -76,7 +78,9 @@ public final class Spaces {
         return true;
     }
     public static Vec3 landing(EntityMaid maid, SubLevel s, BlockPos feet) {
-        Level level = maid.level();
+        return landing(maid, maid.level(), s, feet);
+    }
+    public static Vec3 landing(EntityMaid maid, Level level, SubLevel s, BlockPos feet) {
         BlockPos floor = feet.below();
         if (!upright(s) || !belongs(level, feet, s) || !belongs(level, floor, s) || !level.hasChunkAt(floor)) return null;
         var state = level.getBlockState(floor);
@@ -84,7 +88,7 @@ public final class Spaces {
         if (!level.getFluidState(feet).isEmpty()) return null;
         Vec3 target = world(s, Vec3.atBottomCenterOf(feet)).add(0, 0.06, 0);
         AABB box = maid.getBoundingBox().move(target.subtract(maid.position())).deflate(0.001);
-        return clear(maid, box) ? target : null;
+        return clear(maid, level, box) ? target : null;
     }
     public static boolean teleportNear(EntityMaid maid, SubLevel s, Vec3 center, boolean avoidCenter) {
         if (s != null && (s.isRemoved() || !upright(s))) return false;
