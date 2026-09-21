@@ -76,6 +76,7 @@ neoForge {
         gameTestServer {
             type = "gameTestServer"
             systemProperty 'neoforge.enabledGameTestNamespaces', project.mod_id
+            systemProperty 'tlm_sablecompat.tests', 'true'
         }
 
         data {
@@ -99,7 +100,7 @@ neoForge {
             // Recommended logging level for the console
             // You can set various levels here.
             // Please read: https://stackoverflow.com/questions/2031163/when-to-use-the-different-log-levels
-            logLevel = org.slf4j.event.Level.DEBUG
+            logLevel = org.slf4j.event.Level.INFO
         }
     }
 
@@ -119,12 +120,24 @@ neoForge {
 // "optional", meaning it will not be pulled by dependents of this mod.
 configurations {
     runtimeClasspath.extendsFrom localRuntime
+    sableArchive
+}
+
+tasks.register('extractSableApi', Copy) {
+    from({ zipTree(configurations.sableArchive.singleFile) })
+    include 'META-INF/jarjar/sable-companion-*.jar'
+    eachFile { path = name }
+    includeEmptyDirs = false
+    into layout.buildDirectory.dir('sable-api')
 }
 
 dependencies {
     implementation "curse.maven:touhou-little-maid-355044:${touhou_little_maid_curse_file_id}"
     implementation "curse.maven:sable-1312371:${sable_curse_file_id}"
+    sableArchive "curse.maven:sable-1312371:${sable_curse_file_id}"
+    compileOnly fileTree(layout.buildDirectory.dir('sable-api')) { include '*.jar' }
 }
+tasks.named('compileJava') { dependsOn 'extractSableApi' }
 
 // This block of code expands all declared replace properties in the specified resource targets.
 // A missing property will result in an error. Properties are expanded using ${} Groovy notation.

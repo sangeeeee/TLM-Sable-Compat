@@ -1,0 +1,12 @@
+{
+  "required": true,
+  "minVersion": "0.8",
+  "package": "com.sange.tlm_sablecompat.mixin",
+  "compatibilityLevel": "JAVA_21",
+  "mixins": [
+    "AssemblyMixin", "ContainerMixin", "CompassMixin", "HomeConfigMixin",
+    "ScheduleMixin", "MaidMixin", "FollowMixin", "MoveSinkMixin", "NodeEvaluatorMixin",
+    "BfsMixin", "WorkSearchMixin", "VehicleFollowMixin", "LookControlMixin"
+  ],
+  "injectors": { "defaultRequire": 1 }
+}

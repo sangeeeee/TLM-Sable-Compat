@@ -11,6 +11,9 @@ description='''
 Compatibility support between Touhou Little Maid and Sable.
 '''
 
+[[mixins]]
+config="tlm_sablecompat.mixins.json"
+
 [[dependencies.${mod_id}]]
     modId="neoforge"
     type="required"

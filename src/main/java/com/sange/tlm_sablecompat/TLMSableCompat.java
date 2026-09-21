@@ -12,7 +12,16 @@ public final class TLMSableCompat {
     public static final String MOD_ID = "tlm_sablecompat";
     public static final Logger LOGGER = LogUtils.getLogger();
 
-    public TLMSableCompat() {
+    public TLMSableCompat(net.neoforged.bus.api.IEventBus modBus) {
+        net.neoforged.neoforge.common.NeoForge.EVENT_BUS.addListener(this::afterServerTick);
+        if (Boolean.getBoolean("tlm_sablecompat.tests")) {
+            modBus.addListener((net.neoforged.neoforge.event.RegisterGameTestsEvent event) ->
+                    event.register(com.sange.tlm_sablecompat.test.CompatGameTests.class));
+        }
         LOGGER.info("TLM Sable Compat initialized");
+    }
+
+    private void afterServerTick(net.neoforged.neoforge.event.tick.ServerTickEvent.Post event) {
+        BindingStore.get(event.getServer().overworld()).settle();
     }
 }
