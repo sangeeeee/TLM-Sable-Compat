@@ -90,4 +90,32 @@ public class FishingGameTests {
         maid.fishing.tick();h.assertTrue(!maid.fishing.isRemoved(),"Ordinary hook must remain valid in water");
         maid.fishing.discard();maid.discard();chair.discard();CompatGameTests.cleanup(h,a,b);h.succeed();
     }
+    @GameTest(templateNamespace="tlm_sablecompat",template="empty")
+    public static void structureFishingWorldWater(GameTestHelper h) throws ReflectiveOperationException {
+        var ship=CompatGameTests.platform(h,1);var maid=CompatGameTests.maid(h,ship);
+        Homes.setSimple(maid);maid.setHomeModeEnable(true);maid.getSchedulePos().restrictTo(maid);
+        maid.setTask(new TaskFishing());maid.setItemInHand(InteractionHand.MAIN_HAND,new ItemStack(Items.FISHING_ROD));
+        var chair=new EntityChair(h.getLevel());chair.setPos(maid.position());h.getLevel().addFreshEntity(chair);
+        ((EntityMovementExtension)chair).sable$setTrackingSubLevel(ship);maid.startRiding(chair,true);
+        BlockPos pool=maid.blockPosition().east(2);
+        h.getLevel().setBlock(pool,Blocks.WATER.defaultBlockState(),2);
+        var task=new MaidRideFindWaterTask(6,3);start(task,h,maid);start(task,h,maid);
+        var hook=maid.fishing;
+        h.assertTrue(hook!=null && !hook.getPersistentData().hasUUID(Resting.KEY),"Structure Home must allow nearby ordinary water without anchoring the hook to the ship");
+        for(int i=0;i<8;i++) hook.tick();
+        var lure=MaidFishingHook.class.getDeclaredField("timeUntilLured");lure.setAccessible(true);
+        h.assertTrue(!hook.isRemoved() && lure.getInt(hook)>0,"World pool must advance native bite timers");
+        Vec3 local=Spaces.local(ship,maid.position()),before=hook.position();
+        ship.logicalPose().position().add(2,0,0);maid.setPos(Spaces.world(ship,local));chair.setPos(maid.position());hook.tick();
+        h.assertTrue(Math.abs(hook.getX()-before.x)<0.01 && Math.abs(hook.getZ()-before.z)<0.01,"World hook must not move with the ship");
+        ship.logicalPose().position().add(30,0,0);maid.setPos(Spaces.world(ship,local));chair.setPos(maid.position());hook.tick();
+        h.assertTrue(hook.isRemoved(),"Sailing out of native hook range must stop fishing");
+        start(task,h,maid);h.assertTrue(maid.fishing==null,"Out-of-range cached world pool must not be recast");
+        maid.setHomeModeEnable(false);((EntityMovementExtension)maid).sable$setTrackingSubLevel(null);
+        BlockPos structurePool=ship.getPlot().getCenterBlock().offset(5,1,3);
+        h.getLevel().setBlock(structurePool,Blocks.WATER.defaultBlockState(),2);
+        var waterField=MaidRideFindWaterTask.class.getDeclaredField("waterPos");waterField.setAccessible(true);waterField.set(task,structurePool);
+        start(task,h,maid);h.assertTrue(maid.fishing==null,"World maid must not cast into a structure pool");
+        maid.discard();chair.discard();CompatGameTests.cleanup(h,ship);h.succeed();
+    }
 }
