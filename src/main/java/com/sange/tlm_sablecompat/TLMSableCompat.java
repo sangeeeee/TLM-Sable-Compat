@@ -22,6 +22,10 @@ public final class TLMSableCompat {
                 event.register(com.sange.tlm_sablecompat.test.FishingGameTests.class);
                 if (net.neoforged.fml.ModList.get().isLoaded("muhc"))
                     event.register(com.sange.tlm_sablecompat.test.HandCrankGameTests.class);
+                if (net.neoforged.fml.ModList.get().isLoaded("kaleidoscope_compat")
+                        && net.neoforged.fml.ModList.get().isLoaded("maidsoulkitchen")
+                        && net.neoforged.fml.ModList.get().isLoaded("eclipticseasons_multimodpatch"))
+                    event.register(com.sange.tlm_sablecompat.test.AddonGameTests.class);
             });
         }
         LOGGER.info("TLM Sable Compat initialized");

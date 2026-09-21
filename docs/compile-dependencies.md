@@ -6,6 +6,7 @@
 | --- | --- | --- |
 | Kaleidoscope Cookery | 1.5.0-neoforge+mc1.21.1 | [Modrinth](https://modrinth.com/mod/kaleidoscope-cookery/version/v62omIkI) |
 | Kaleidoscope Tavern | 1.2.0-neoforge+mc1.21.1 | [Modrinth](https://modrinth.com/mod/kaleidoscopetavern/version/W9ILsQt7) |
+| Kaleidoscope Compat（菜板、石磨、果盆任务提供者） | 2.9.7-neoforge+mc1.21.1-Patch | [CurseForge](https://www.curseforge.com/minecraft/mc-mods/kaleidoscope-compat/files/8920105) |
 | MaidUseHandCrank | 1.6.2 | [Modrinth](https://modrinth.com/mod/maidusehandcrank/version/Qu15bii2) |
 | Ecliptic Seasons | 0.15.0-rc-3-1 | [Modrinth](https://modrinth.com/mod/ecliptic-seasons/version/p7byuyzM) |
 | Ecliptic Seasons: MultiMod Patch | 0.32.1 | [CurseForge](https://www.curseforge.com/minecraft/mc-mods/ecliptic-seasons-multimod-patch/files/8813347) |
@@ -30,4 +31,6 @@ Maidsoul Kitchen 的必需前置车万女仆已由基础依赖提供；Barbeque'
 
 必需前置车万女仆，以及 Minecraft、NeoForge 已由现有基础依赖提供，不重复声明。根据所选版本的发布元数据和 JAR 依赖声明，厨房、酒馆、节气没有其他必装独立模组；JEI、KubeJS、Create Connected 等可选联动不属于本次前置范围。
 
-既有 `muhcTestJar` / `createTestJar` 可选测试配置继续保留：仅显式提供这两个参数时，才将指定本地 JAR 加入测试运行环境。本次只准备编译依赖，不新增任务适配行为。
+既有 `muhcTestJar` / `createTestJar` 可选测试配置继续保留。另可显式使用 `-PaddonTests`，将本表依赖加入开发运行环境并注册附属任务 GameTest；默认构建仍全部仅编译，不打包、不要求玩家安装。不要同时传入两个测试配置，以免加载重复模组。
+
+Kaleidoscope Compat 的 Patch JAR 没有嵌套库，且含有 Gradle ZIP 读取器拒绝的目录条目，因此不参与 `extractCompatApis`。原始 JAR 直接用于编译及可选测试运行，Java JAR 读取器可正常读取；不重新打包第三方模组。

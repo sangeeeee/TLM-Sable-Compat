@@ -8,7 +8,9 @@
     "ScheduleMixin", "MaidMixin", "FollowMixin", "MoveSinkMixin", "NodeEvaluatorMixin",
     "BfsMixin", "WorkSearchMixin", "VehicleFollowMixin", "LookControlMixin", "HandCrankSearchMixin",
     "BlockArrivalMixin", "PoiTasksMixin", "SeatMixin", "SleepMixin", "BedPositionMixin", "EntitySensorMixin", "RangedWalkMixin",
-    "FishingTaskMixin", "FishingHookMixin"
+    "FishingTaskMixin", "FishingHookMixin",
+    "KitchenSearchMixin", "KitchenCookSearchMixin", "KitchenArrivalMixin", "KitchenContinuousMixin", "KitchenContainersMixin", "KitchenBerryPathMixin",
+    "SeasonSnowSearchMixin", "KaleidoscopeTaskMixin", "KaleidoscopeMotionMixin", "KaleidoscopeTubMixin", "KaleidoscopeBoardStandMixin", "MillstoneBindingMixin"
   ],
   "injectors": { "defaultRequire": 1 }
 }

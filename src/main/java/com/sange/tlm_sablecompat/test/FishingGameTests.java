@@ -52,11 +52,20 @@ public class FishingGameTests {
         Vec3 localHook=Spaces.local(ship,hook.position());
         h.assertTrue(!hook.isRemoved() && Math.abs(localHook.x-water.getX()-0.5)<0.001 && Math.abs(localHook.z-water.getZ()-0.5)<0.001,"Floating hook must follow pool translation and yaw");
         var nibble=MaidFishingHook.class.getDeclaredField("nibble");nibble.setAccessible(true);nibble.setInt(hook,2);
-        int before=h.getLevel().getEntitiesOfClass(ItemEntity.class,maid.getBoundingBox().inflate(3)).size();
-        hook.tick();
+        // Keep the real fishing table, but make its random sequence reproducible across optional loot integrations.
+        h.getLevel().getRandomSequence(net.minecraft.world.level.storage.loot.BuiltInLootTables.FISHING.location()).setSeed(42L);
+        // Translating the test ship by 80 blocks leaves GameTest's entity-query-visible chunks.
+        // Observe the real spawn instead of treating an empty spatial query there as absent loot.
+        var loot=new java.util.ArrayList<ItemEntity>();
+        java.util.function.Consumer<net.neoforged.neoforge.event.entity.EntityJoinLevelEvent> observer=e->{
+            if(e.getLevel()==h.getLevel() && e.getEntity() instanceof ItemEntity item && item.position().distanceTo(maid.position())<3) loot.add(item);
+        };
+        net.neoforged.neoforge.common.NeoForge.EVENT_BUS.addListener(observer);
+        try { hook.tick(); } finally { net.neoforged.neoforge.common.NeoForge.EVENT_BUS.unregister(observer); }
         h.assertTrue(hook.isRemoved() && maid.fishing==null,"Native bite must retrieve the hook");
         h.assertTrue(!hook.isOpenWaterFishing(),"One-cell pool must not bypass the original open-water treasure requirement");
-        h.assertTrue(maid.getMainHandItem().getDamageValue()>0 && h.getLevel().getEntitiesOfClass(ItemEntity.class,maid.getBoundingBox().inflate(3)).size()>before,"Native fishing must produce loot and wear the rod");
+        h.assertTrue(maid.getMainHandItem().getDamageValue()>0,"Native fishing must wear the rod");
+        h.assertTrue(loot.stream().anyMatch(i->!i.getItem().isEmpty()),"Native fishing must spawn loot at the maid's world position");
         start(task,h,maid);h.assertTrue(maid.fishing!=null,"Maid must be able to cast again");
         var next=maid.fishing;h.getLevel().setBlock(water,Blocks.AIR.defaultBlockState(),2);next.tick();
         h.assertTrue(next.isRemoved(),"Removing the pool must end fishing instead of fishing empty space");

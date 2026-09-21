@@ -131,12 +131,15 @@ configurations {
         transitive = false
     }
     compileOnly.extendsFrom compatCompileOnly
+    if (providers.gradleProperty('addonTests').isPresent()) localRuntime.extendsFrom compatCompileOnly
 }
 
 // Jar-in-jar libraries are not visible to javac through the outer mod JAR.
 // Use the exact bundled versions, without adding them to runtime or our own JAR.
 def extractCompatApis = tasks.register('extractCompatApis', Sync) {
-    from({ configurations.compatCompileOnly.collect { zipTree(it) } })
+    // Kaleidoscope Compat has no embedded libraries; its Patch JAR has directory entries
+    // rejected by Gradle's ZIP reader, although Java's JAR reader can load it normally.
+    from({ configurations.compatCompileOnly.findAll { !it.name.startsWith('kaleidoscope-compat-') }.collect { zipTree(it) } })
     include 'META-INF/jarjar/*.jar'
     eachFile { path = name }
     includeEmptyDirs = false
@@ -162,6 +165,7 @@ dependencies {
     // Optional task integrations: pinned NeoForge 1.21.1 artifacts, compile classpath only.
     compatCompileOnly "maven.modrinth:kaleidoscope-cookery:${cookery_modrinth_version_id}"
     compatCompileOnly "maven.modrinth:kaleidoscopetavern:${tavern_modrinth_version_id}"
+    compatCompileOnly "curse.maven:kaleidoscope-compat-1580791:${kaleidoscope_compat_curse_file_id}"
     compatCompileOnly "maven.modrinth:maidusehandcrank:${muhc_modrinth_version_id}"
     compatCompileOnly "maven.modrinth:ecliptic-seasons:${ecliptic_modrinth_version_id}"
     compatCompileOnly "curse.maven:ecliptic-seasons-multimod-patch-1316748:${ecliptic_patch_curse_file_id}"

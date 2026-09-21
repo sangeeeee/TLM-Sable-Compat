@@ -12,6 +12,16 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
 @Mixin(value = MaidMoveToBlockTask.class, remap = false)
 public class WorkSearchMixin {
+    @Redirect(method="searchForDestination",at=@At(value="INVOKE",target="Lnet/minecraft/world/entity/ai/behavior/BehaviorUtils;setWalkAndLookTargetMemories(Lnet/minecraft/world/entity/LivingEntity;Lnet/minecraft/core/BlockPos;FI)V"))
+    private void berryStanding(net.minecraft.world.entity.LivingEntity entity,BlockPos pos,float speed,int distance) {
+        if (entity instanceof EntityMaid m && Work.active(m)
+                && (Object)this instanceof com.sange.tlm_sablecompat.AddonWork.BerryPath berry) {
+            var standing=berry.tlmsc$berryStanding();
+            m.getBrain().setMemory(net.minecraft.world.entity.ai.memory.MemoryModuleType.LOOK_TARGET,new net.minecraft.world.entity.ai.behavior.BlockPosTracker(pos));
+            if(standing!=null) m.getBrain().setMemory(net.minecraft.world.entity.ai.memory.MemoryModuleType.WALK_TARGET,new net.minecraft.world.entity.ai.memory.WalkTarget(standing,speed,0));
+            else m.getBrain().eraseMemory(net.minecraft.world.entity.ai.memory.MemoryModuleType.WALK_TARGET);
+        } else net.minecraft.world.entity.ai.behavior.BehaviorUtils.setWalkAndLookTargetMemories(entity,pos,speed,distance);
+    }
     @Inject(method="searchForDestination",at=@At("HEAD"),cancellable=true)
     private void allowed(net.minecraft.server.level.ServerLevel level,EntityMaid maid,org.spongepowered.asm.mixin.injection.callback.CallbackInfo ci) {
         if (Work.active(maid) && !Work.ready(maid)) ci.cancel();
