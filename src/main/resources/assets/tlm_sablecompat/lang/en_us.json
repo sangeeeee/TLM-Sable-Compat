@@ -11,7 +11,6 @@
   "message.tlm_sablecompat.other_structure": "Binding failed: the maid is in a different space.",
   "message.tlm_sablecompat.far": "Binding failed: the nearest activity point is over 32 blocks away.",
   "message.tlm_sablecompat.unstable": "Cannot set Home without reliable structure support.",
-  "message.tlm_sablecompat.legacy": "This old compass has no reliable structure identity. Clear and record it again.",
   "message.tlm_sablecompat.compass_space": "All compass points must belong to the same dimension and the same world or structure.",
   "message.tlm_sablecompat.compass_full": "Three points already recorded. Clear the compass to start again.",
   "message.tlm_sablecompat.compass_far": "The previous activity point is over 64 blocks away.",

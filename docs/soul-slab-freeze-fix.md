@@ -1,4 +1,4 @@
-# 0.0.2-beta：结构 Home 后魂符释放异常
+# 开发阶段问题记录：结构 Home 后魂符释放异常
 
 ## 日志证据
 
@@ -41,11 +41,11 @@ ModernFix watchdog 在 14:31:02、14:31:44、14:32:26 报告同一 tick 已耗�
 
 女仆原模组的 `SlabClickEvent` 会在魂符收纳前主动关闭 Home。本次测试确认兼容绑定引用仍保存，但释放后不擅自重新打开 Home。
 
-## 验证与更新
+## 当时的验证与安装
 
 - 基础环境：13 项 GameTest 全部通过，包含实际魂符收纳、移动结构后释放以及新魂符释放。
 - 加载整合包的 MUHC 1.6.2 与 Create 6.0.10：14 项 GameTest 全部通过，包含真实曲柄 POI 查询和完整工作点选择方法。
-- `build` 成功，输出 `build/libs/tlm_sablecompat-neoforge-1.21.1-0.0.2-beta.jar`。
+- `build` 成功，输出 `build/libs/tlm_sablecompat-neoforge-1.21.1-0.0.1-beta.jar`。
 
 可选依赖测试命令（路径替换为本机 JAR）：
 
@@ -53,4 +53,4 @@ ModernFix watchdog 在 14:31:02、14:31:44、14:32:26 报告同一 tick 已耗�
 gradlew runGameTestServer -PmuhcTestJar="path/to/MaidUseHandCrank.jar" -PcreateTestJar="path/to/create.jar"
 ```
 
-退出游戏后，用新版替换 `mods` 中的 `0.0.1-beta`，不要同时保留两版，再重启游戏。此次没有修改 Earth2 Reborn 的模组文件或存档，也没有在完整整合包客户端中实测修复后的表现。
+退出游戏后，用当前构建的 `0.0.1-beta` JAR 替换 `mods` 中的同名模组，再重启游戏。后续工作阶段的测试记录见 [工作阶段说明](work-rest-compatibility.md)。此次没有修改 Earth2 Reborn 的模组文件或存档，也没有在完整整合包客户端中实测修复后的表现。

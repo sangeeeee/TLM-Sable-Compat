@@ -31,6 +31,7 @@ public final class Homes {
     public static void attach(EntityMaid maid, UUID id) {
         maid.getPersistentData().putUUID(KEY, id);
         Navigation.state(maid).notified = "";
+        Navigation.state(maid).resetTasks = true;
         sync(maid, binding(maid));
         Navigation.clearMovement(maid);
     }
@@ -107,6 +108,7 @@ public final class Homes {
         notifyOwner(maid, error, false);
         var state = Navigation.state(maid);
         if (!error.isEmpty()) {
+            Resting.leave(maid);
             if (!state.suspended) {
                 Navigation.clearMovement(maid);
                 maid.getBrain().eraseMemory(InitEntities.TARGET_POS.get());
@@ -115,15 +117,21 @@ public final class Homes {
         }
         state.suspended = false;
         maid.getSchedulePos().restrictTo(maid);
-        if (!maid.canBrainMoving() || maid.tickCount % 40 != 0) return true;
+        if (!maid.canBrainMoving()) return true;
         Binding.Point target = b.activity(activity(maid));
         SubLevel s = Spaces.resolve(maid.level(), target.structure());
         Vec3 local = Spaces.local(s, maid.position());
         double distance = target.position().getCenter().distanceTo(local);
         if (Spaces.tracking(maid) == s && distance < maid.getRestrictRadius()) return true;
-        if (Spaces.tracking(maid) != s || distance > maid.getRestrictRadius() + 4) {
-            Spaces.teleportNear(maid, s, target.position().getCenter(), false);
-        } else {
+        if (Spaces.tracking(maid) != s) {
+            if (state.leftAt<0) state.leftAt=maid.level().getGameTime();
+            if (Navigation.departureConfirmed(maid) && maid.level().getGameTime()>=state.retryAt) {
+                state.retryAt=maid.level().getGameTime()+20;
+                Spaces.teleportNear(maid,s,target.position().getCenter(),false);
+            }
+        } else if (maid.tickCount % 40 == 0) {
+            var path=maid.getNavigation().createPath(target.position(),1);
+            if (path==null || !path.canReach()) { Spaces.teleportNear(maid,s,target.position().getCenter(),false); return true; }
             BehaviorUtils.setWalkAndLookTargetMemories(maid, target.position(), 0.7f, 3);
         }
         return true;

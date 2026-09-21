@@ -25,20 +25,7 @@ public final class Compasses {
         CustomData.update(DataComponents.CUSTOM_DATA, stack, t -> t.putUUID(Homes.KEY, id));
     }
     private static Binding read(ServerLevel level, ItemStack stack) {
-        UUID id = id(stack);
-        if (id != null) return BindingStore.get(level).find(id);
-        // Adopt ordinary-world legacy compasses; ambiguous old plot addresses require re-recording.
-        if (!ItemKappaCompass.hasKappaCompassData(stack)) return null;
-        Binding b = new Binding(true);
-        for (Activity a : new Activity[]{Activity.WORK, Activity.IDLE, Activity.REST}) {
-            BlockPos p = ItemKappaCompass.getPoint(a, stack);
-            if (p == null) continue;
-            if (Sable.HELPER.isInPlotGrid(level, p.getX() >> 4, p.getZ() >> 4)) b.failure = "legacy";
-            b.points.add(new Binding.Point(ItemKappaCompass.getDimension(stack).toString(), null, p, p));
-            if (b.points.size() >= ItemKappaCompass.getRecordCount(stack)) break;
-        }
-        attach(stack, BindingStore.get(level).add(b));
-        return b;
+        return BindingStore.get(level).find(id(stack));
     }
     private static void sync(ItemStack stack, Binding b) {
         stack.remove(InitDataComponent.KAPPA_COMPASS_ACTIVITY_POS);

@@ -99,6 +99,8 @@ public final class Spaces {
             ((EntityMovementExtension)maid).sable$setTrackingSubLevel(s);
             maid.setDeltaMovement(Vec3.ZERO);
             Navigation.clearMovement(maid);
+            Navigation.state(maid).resetTasks = true;
+            Combat.afterTransfer(maid);
             maid.getBrain().eraseMemory(net.minecraft.world.entity.ai.memory.MemoryModuleType.LOOK_TARGET);
             maid.getBrain().eraseMemory(net.minecraft.world.entity.ai.memory.MemoryModuleType.ATTACK_TARGET);
             maid.getBrain().eraseMemory(com.github.tartaricacid.touhoulittlemaid.init.InitEntities.TARGET_POS.get());

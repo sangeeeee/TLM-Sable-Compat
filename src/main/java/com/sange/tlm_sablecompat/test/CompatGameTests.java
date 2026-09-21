@@ -33,8 +33,8 @@ import java.util.*;
 /** Loaded only by the explicitly enabled development GameTest run. */
 @PrefixGameTestTemplate(false)
 public class CompatGameTests {
-    private static final Map<EntityMaid, ServerPlayer> OWNERS = new WeakHashMap<>();
-    private static ServerPlayer player(GameTestHelper h) {
+    static final Map<EntityMaid, ServerPlayer> OWNERS = new WeakHashMap<>();
+    static ServerPlayer player(GameTestHelper h) {
         return net.neoforged.neoforge.common.util.FakePlayerFactory.get(h.getLevel(),
                 new com.mojang.authlib.GameProfile(UUID.randomUUID(), "compat-test"));
     }

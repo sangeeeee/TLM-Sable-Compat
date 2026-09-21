@@ -11,7 +11,6 @@
   "message.tlm_sablecompat.other_structure": "绑定失败：女仆位于另一空间，请将她带到目标结构上。",
   "message.tlm_sablecompat.far": "绑定失败：距离最近活动点超过 32 格。",
   "message.tlm_sablecompat.unstable": "无法设置 Home：未找到可靠的结构支撑，请落稳后重试。",
-  "message.tlm_sablecompat.legacy": "旧罗盘缺少可靠的结构身份，请清空后重新记录。",
   "message.tlm_sablecompat.compass_space": "记录失败：罗盘只能记录同一维度的同一普通世界或同一结构。",
   "message.tlm_sablecompat.compass_full": "罗盘已记录三个活动点，请先清空再重新设置。",
   "message.tlm_sablecompat.compass_far": "记录失败：与上一个活动点相距超过 64 格。",

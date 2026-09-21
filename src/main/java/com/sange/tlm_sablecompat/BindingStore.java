@@ -21,6 +21,7 @@ public final class BindingStore extends SavedData {
         UUID id = UUID.randomUUID(); bindings.put(id, b); needsValidation = true; setDirty(); return id;
     }
     public Binding find(UUID id) { return id == null ? null : bindings.get(id); }
+    public void release(UUID id) { if (bindings.remove(id) != null) setDirty(); }
     public void changed() { setDirty(); }
     public void removed(String dimension, UUID structure) {
         for (Binding b : bindings.values()) {

@@ -15,6 +15,7 @@ public abstract class NodeEvaluatorMixin extends WalkNodeEvaluator {
     private void limit(PathfindingContext context, int x, int y, int z, CallbackInfoReturnable<PathType> cir) {
         if (!(mob instanceof EntityMaid maid)) return;
         var s = Spaces.tracking(maid);
-        if (s != null && (!Spaces.belongs(maid.level(), new BlockPos(x, y, z), s) || !Spaces.upright(s))) cir.setReturnValue(PathType.BLOCKED);
+        if (Work.active(maid) && !Work.ready(maid)) { cir.setReturnValue(PathType.BLOCKED); return; }
+        if (s != null && (!Work.ready(maid) || !Spaces.belongs(maid.level(), new BlockPos(x, y, z), s) || !Spaces.upright(s))) cir.setReturnValue(PathType.BLOCKED);
     }
 }

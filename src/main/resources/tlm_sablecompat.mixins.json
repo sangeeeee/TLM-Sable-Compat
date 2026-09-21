@@ -6,7 +6,8 @@
   "mixins": [
     "AssemblyMixin", "ContainerMixin", "CompassMixin", "HomeConfigMixin",
     "ScheduleMixin", "MaidMixin", "FollowMixin", "MoveSinkMixin", "NodeEvaluatorMixin",
-    "BfsMixin", "WorkSearchMixin", "VehicleFollowMixin", "LookControlMixin", "HandCrankSearchMixin"
+    "BfsMixin", "WorkSearchMixin", "VehicleFollowMixin", "LookControlMixin", "HandCrankSearchMixin",
+    "BlockArrivalMixin", "PoiTasksMixin", "SeatMixin", "SleepMixin", "BedPositionMixin", "EntitySensorMixin", "RangedWalkMixin"
   ],
   "injectors": { "defaultRequire": 1 }
 }
