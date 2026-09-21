@@ -38,7 +38,7 @@ public class CompatGameTests {
         return net.neoforged.neoforge.common.util.FakePlayerFactory.get(h.getLevel(),
                 new com.mojang.authlib.GameProfile(UUID.randomUUID(), "compat-test"));
     }
-    private static ServerSubLevel platform(GameTestHelper h, int offset) {
+    static ServerSubLevel platform(GameTestHelper h, int offset) {
         var blocks = new ArrayList<BlockPos>();
         BlockPos origin = h.absolutePos(new BlockPos(offset, 3, 1));
         for (int x = 0; x < 7; x++) for (int z = 0; z < 7; z++) {
@@ -46,7 +46,7 @@ public class CompatGameTests {
         }
         return SubLevelAssemblyHelper.assembleBlocks(h.getLevel(), origin, blocks, Objects.requireNonNull(BoundingBox3i.from(blocks)).expand(1,1,1));
     }
-    private static EntityMaid maid(GameTestHelper h, ServerSubLevel s) {
+    static EntityMaid maid(GameTestHelper h, ServerSubLevel s) {
         EntityMaid m = new EntityMaid(h.getLevel()) {
             @Override public net.minecraft.world.entity.LivingEntity getOwner() { return OWNERS.get(this); }
         };
@@ -62,7 +62,7 @@ public class CompatGameTests {
         BlockPos a = s.getPlot().getCenterBlock();
         b.points.add(Spaces.point(h.getLevel(), s, a.above(), a)); return b;
     }
-    private static void cleanup(GameTestHelper h, ServerSubLevel... structures) {
+    static void cleanup(GameTestHelper h, ServerSubLevel... structures) {
         for (var s : structures) if (!s.isRemoved()) SubLevelContainer.getContainer(h.getLevel()).removeSubLevel(s, SubLevelRemovalReason.REMOVED);
     }
     @GameTest(templateNamespace = "tlm_sablecompat", template = "empty")
@@ -254,5 +254,49 @@ public class CompatGameTests {
             h.assertTrue(actual.distanceTo(Spaces.world(a,look))<0.001,"Look target must use projected world coordinates");
         } catch (ReflectiveOperationException e) { throw new AssertionError(e); }
         m.discard(); cleanup(h,a); h.succeed();
+    }
+
+    @GameTest(templateNamespace = "tlm_sablecompat", template = "empty")
+    public static void separatedPoiSearchIsBounded(GameTestHelper h) {
+        // Exact centers/radii from Earth2 Reborn debug.log, 2026-09-21 14:29:40.887.
+        Vec3 home = new Vec3(20481025.5,86.5,20487176.5);
+        Vec3 maid = new Vec3(-135.3355791179539,271.86926885346224,-30.64683195781662);
+        var chunks = PoiSearch.aroundBoth(home,11,maid,4).toList();
+        h.assertTrue(chunks.size()<=13,"Search cost must depend on radii, not distance between the centers");
+        h.assertTrue(chunks.contains(new net.minecraft.world.level.ChunkPos(BlockPos.containing(home))) &&
+                chunks.contains(new net.minecraft.world.level.ChunkPos(BlockPos.containing(maid))),"Both actual search areas must be included");
+        h.assertTrue(!chunks.contains(new net.minecraft.world.level.ChunkPos(500000,500000)),"Do not enumerate the gap between search areas");
+        h.succeed();
+    }
+
+    @GameTest(templateNamespace = "tlm_sablecompat", template = "empty")
+    public static void soulSlabHomeRoundTrip(GameTestHelper h) {
+        var a = platform(h,1); var m = maid(h,a); var owner = player(h); m.tame(owner); OWNERS.put(m,owner);
+        m.getSchedulePos().setHomeModeEnable(m,m.blockPosition());
+        m.setHomeModeEnable(true); m.getSchedulePos().restrictTo(m);
+        UUID maidId = m.getUUID(), homeId = Homes.id(m);
+        owner.setItemInHand(InteractionHand.MAIN_HAND,new ItemStack(InitItems.SMART_SLAB_EMPTY.get()));
+        // Real TLM capture event: it intentionally switches Home off before serializing the maid.
+        net.neoforged.neoforge.common.NeoForge.EVENT_BUS.post(
+                new com.github.tartaricacid.touhoulittlemaid.api.event.InteractMaidEvent(owner,m,owner.getMainHandItem()));
+        h.assertTrue(m.isRemoved() && owner.getMainHandItem().is(InitItems.SMART_SLAB_HAS_MAID.get()),"Soul slab must capture the maid");
+        a.logicalPose().position().add(20,0,10);
+        BlockPos pos = a.getPlot().getCenterBlock().offset(4,0,4);
+        var ctx = new UseOnContext(owner,InteractionHand.MAIN_HAND,new BlockHitResult(pos.getCenter(),Direction.UP,pos,false));
+        h.assertTrue(owner.getMainHandItem().getItem().useOn(ctx).consumesAction(),"Stored slab release should succeed");
+        var restored = (EntityMaid)h.getLevel().getEntity(maidId);
+        h.assertTrue(restored!=null && !restored.isRemoved(),"Released maid must exist on the server");
+        h.assertTrue(restored.position().distanceTo(Spaces.world(a,Vec3.atBottomCenterOf(pos.above())))<0.01,"Sable must project soul release onto the moved deck exactly once");
+        h.assertTrue(homeId.equals(Homes.id(restored)) && !restored.isHomeModeEnable(),"Preserve binding while respecting TLM soul slab's Home-off behavior");
+        ItemStack fresh = new ItemStack(InitItems.SMART_SLAB_INIT.get());
+        owner.setItemInHand(InteractionHand.MAIN_HAND,fresh);
+        Set<UUID> before = new HashSet<>();
+        for (var entity : h.getLevel().getAllEntities()) if (entity instanceof EntityMaid) before.add(entity.getUUID());
+        var freshCtx = new UseOnContext(owner,InteractionHand.MAIN_HAND,new BlockHitResult(pos.getCenter(),Direction.UP,pos,false));
+        h.assertTrue(fresh.getItem().useOn(freshCtx).consumesAction(),"A fresh soul slab should still work after the round trip");
+        EntityMaid created = null;
+        for (var entity : h.getLevel().getAllEntities()) if (entity instanceof EntityMaid candidate && !before.contains(candidate.getUUID())) created=candidate;
+        h.assertTrue(created!=null && created.position().distanceTo(restored.position())<0.01,"Fresh maid must appear on the same deck");
+        created.discard(); restored.discard(); cleanup(h,a); h.succeed();
     }
 }

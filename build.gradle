@@ -136,6 +136,11 @@ dependencies {
     implementation "curse.maven:sable-1312371:${sable_curse_file_id}"
     sableArchive "curse.maven:sable-1312371:${sable_curse_file_id}"
     compileOnly fileTree(layout.buildDirectory.dir('sable-api')) { include '*.jar' }
+    // Optional regression profile, using user-supplied MUHC and Create jars (never bundled).
+    if (providers.gradleProperty('muhcTestJar').isPresent()) {
+        localRuntime files(providers.gradleProperty('muhcTestJar').get())
+        localRuntime files(providers.gradleProperty('createTestJar').get())
+    }
 }
 tasks.named('compileJava') { dependsOn 'extractSableApi' }
 

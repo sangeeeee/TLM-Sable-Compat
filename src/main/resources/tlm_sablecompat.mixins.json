@@ -6,7 +6,7 @@
   "mixins": [
     "AssemblyMixin", "ContainerMixin", "CompassMixin", "HomeConfigMixin",
     "ScheduleMixin", "MaidMixin", "FollowMixin", "MoveSinkMixin", "NodeEvaluatorMixin",
-    "BfsMixin", "WorkSearchMixin", "VehicleFollowMixin", "LookControlMixin"
+    "BfsMixin", "WorkSearchMixin", "VehicleFollowMixin", "LookControlMixin", "HandCrankSearchMixin"
   ],
   "injectors": { "defaultRequire": 1 }
 }

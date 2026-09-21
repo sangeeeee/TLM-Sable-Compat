@@ -15,8 +15,11 @@ public final class TLMSableCompat {
     public TLMSableCompat(net.neoforged.bus.api.IEventBus modBus) {
         net.neoforged.neoforge.common.NeoForge.EVENT_BUS.addListener(this::afterServerTick);
         if (Boolean.getBoolean("tlm_sablecompat.tests")) {
-            modBus.addListener((net.neoforged.neoforge.event.RegisterGameTestsEvent event) ->
-                    event.register(com.sange.tlm_sablecompat.test.CompatGameTests.class));
+            modBus.addListener((net.neoforged.neoforge.event.RegisterGameTestsEvent event) -> {
+                event.register(com.sange.tlm_sablecompat.test.CompatGameTests.class);
+                if (net.neoforged.fml.ModList.get().isLoaded("muhc"))
+                    event.register(com.sange.tlm_sablecompat.test.HandCrankGameTests.class);
+            });
         }
         LOGGER.info("TLM Sable Compat initialized");
     }

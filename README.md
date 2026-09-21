@@ -2,7 +2,7 @@
 
 为 [车万女仆（Touhou Little Maid）](https://www.curseforge.com/minecraft/mc-mods/touhou-little-maid) 与 [Sable](https://www.curseforge.com/minecraft/mc-mods/sable) 提供兼容支持的 Minecraft NeoForge 模组。
 
-当前版本：`0.0.1-beta`  
+当前版本：`0.0.2-beta`
 支持环境：Minecraft `1.21.1` / NeoForge `21.1.248+`
 
 ## 安装
@@ -19,6 +19,8 @@
 
 具体规则、测试范围与手动验证步骤见 [第一阶段兼容说明](docs/compatibility-stage-one.md)。目前验证的依赖版本为女仆 `1.5.3`、Sable `2.0.5`；版本声明允许更新版本，但尚未逐一验证。
 
+`0.0.2-beta` 修复了结构 Home 与女仆摇曲柄（MUHC 1.6.2）搜索坐标混用导致的服务端卡顿，详见 [魂符消失问题分析](docs/soul-slab-freeze-fix.md)。MUHC 保持可选依赖。
+
 ## 构建
 
 使用 Java 21 运行：
@@ -27,7 +29,7 @@
 ./gradlew build
 ```
 
-构建会自动下载所需模组依赖。输出文件位于 `build/libs/tlm_sablecompat-neoforge-1.21.1-0.0.1-beta.jar`。
+构建会自动下载所需模组依赖。输出文件位于 `build/libs/tlm_sablecompat-neoforge-1.21.1-0.0.2-beta.jar`。
 
 运行使用实际 Sable 和女仆模组的服务器集成测试：
 
@@ -41,7 +43,7 @@
 
 An add-on providing compatibility between [Touhou Little Maid](https://www.curseforge.com/minecraft/mc-mods/touhou-little-maid) and [Sable](https://www.curseforge.com/minecraft/mc-mods/sable) for Minecraft NeoForge.
 
-Current version: `0.0.1-beta`  
+Current version: `0.0.2-beta`
 Supported environment: Minecraft `1.21.1` / NeoForge `21.1.248+`
 
 ## Installation
@@ -56,4 +58,4 @@ Run with Java 21:
 ./gradlew build
 ```
 
-The required mod dependencies are downloaded automatically. The output is `build/libs/tlm_sablecompat-neoforge-1.21.1-0.0.1-beta.jar`.
+The required mod dependencies are downloaded automatically. The output is `build/libs/tlm_sablecompat-neoforge-1.21.1-0.0.2-beta.jar`.
