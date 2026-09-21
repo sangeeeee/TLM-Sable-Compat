@@ -184,6 +184,12 @@ dependencies {
     compatCompileOnly "curse.maven:terrafirmacraft-302973:${terrafirmacraft_curse_file_id}"
     compatCompileOnly "maven.modrinth:patchouli:${patchouli_modrinth_version_id}"
     compileOnly fileTree(layout.buildDirectory.dir('compat-api')) { include '*.jar' }.builtBy(extractCompatApis)
+    // Focused optional regression profile, without unrelated task mods or their gameplay changes.
+    if (providers.gradleProperty('tavernTests').isPresent() && !providers.gradleProperty('addonTests').isPresent()) {
+        localRuntime "maven.modrinth:kaleidoscope-cookery:${cookery_modrinth_version_id}"
+        localRuntime "maven.modrinth:kaleidoscopetavern:${tavern_modrinth_version_id}"
+        localRuntime "maven.modrinth:maid-tavern:${maid_tavern_modrinth_version_id}"
+    }
     // Optional regression profile, using user-supplied MUHC and Create jars (never bundled).
     if (providers.gradleProperty('muhcTestJar').isPresent()) {
         localRuntime files(providers.gradleProperty('muhcTestJar').get())

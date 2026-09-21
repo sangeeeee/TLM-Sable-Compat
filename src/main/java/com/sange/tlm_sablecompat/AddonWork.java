@@ -37,6 +37,10 @@ public final class AddonWork {
         return Work.blockAllowed(m,p) && visibleFrom(m,p,position(m));
     }
     private static boolean visibleFrom(EntityMaid m,BlockPos p,Vec3 feet) {
+        return visibleFrom(m,p,feet,p::equals);
+    }
+    /** Multiblock interactions may accept another part of the same workstation as the first hit. */
+    public static boolean visibleFrom(EntityMaid m,BlockPos p,Vec3 feet,java.util.function.Predicate<BlockPos> targetPart) {
         var level=m.level();
         if (!level.hasChunkAt(p)) return false;
         var s=Spaces.tracking(m);
@@ -50,7 +54,7 @@ public final class AddonWork {
         var localRay=new ClipContext(Spaces.local(s,eye),point,ClipContext.Block.COLLIDER,ClipContext.Fluid.NONE,m);
         ((ClipContextExtension)localRay).sable$setDoNotProject(true);
         var hit=level.clip(localRay);
-        if (hit.getType()!=HitResult.Type.MISS && !hit.getBlockPos().equals(p)) return false;
+        if (hit.getType()!=HitResult.Type.MISS && !targetPart.test(hit.getBlockPos())) return false;
         if (s==null) return true;
         // The direct local check also works immediately after a pose change, before broad-phase bounds update.
         var worldRay=new ClipContext(eye,Spaces.world(s,point),ClipContext.Block.COLLIDER,ClipContext.Fluid.NONE,m);
@@ -77,9 +81,14 @@ public final class AddonWork {
         return approach(m,block,reach,p->Work.reachable(m,p,0));
     }
     public static Approach approach(EntityMaid m,BlockPos block,double reach,java.util.function.Predicate<BlockPos> reachable) {
+        return approach(m,block,reach,reachable,feet->visibleFrom(m,block,feet));
+    }
+    public static Approach approach(EntityMaid m,BlockPos block,double reach,java.util.function.Predicate<BlockPos> reachable,
+                                    java.util.function.Predicate<Vec3> visible) {
         if(!Work.blockAllowed(m,block)) return new Approach(false,null);
         boolean board=board(m,block);
-        if((!Work.active(m) && !board) || canInteract(m,block,reach)) return new Approach(true,null);
+        if((!Work.active(m) && !board) || (board ? boardRange(position(m),block)
+                : Work.distance(m,block.getCenter())<=reach*reach) && visible.test(position(m))) return new Approach(true,null);
         int r=board ? 1 : Math.min(8,(int)Math.ceil(reach));
         var candidates=new java.util.ArrayList<BlockPos>();
         for(BlockPos p:BlockPos.betweenClosed(block.offset(-r,-r,-r),block.offset(r,r,r))) {
@@ -87,7 +96,7 @@ public final class AddonWork {
             if(m.level().getBlockState(p.below()).getCollisionShape(m.level(),p.below()).isEmpty()) continue;
             if(!m.level().getBlockState(p).getCollisionShape(m.level(),p).isEmpty()
                     || !m.level().getBlockState(p.above()).getCollisionShape(m.level(),p.above()).isEmpty()) continue;
-            if(!visibleFrom(m,block,Vec3.atBottomCenterOf(p))) continue;
+            if(!visible.test(Vec3.atBottomCenterOf(p))) continue;
             candidates.add(p.immutable());
         }
         candidates.sort(java.util.Comparator.comparingDouble(p->Vec3.atBottomCenterOf(p).distanceToSqr(position(m))));

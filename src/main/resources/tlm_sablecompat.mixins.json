@@ -10,7 +10,9 @@
     "BlockArrivalMixin", "PoiTasksMixin", "JoyTaskMixin", "SeatMixin", "SleepMixin", "BedPositionMixin", "EntitySensorMixin", "RangedWalkMixin",
     "FishingTaskMixin", "FishingHookMixin", "PickupTaskMixin", "PickupSensorMixin", "PickupMixin",
     "KitchenSearchMixin", "KitchenCookSearchMixin", "KitchenArrivalMixin", "KitchenContinuousMixin", "KitchenContainersMixin", "KitchenBerryPathMixin",
-    "SeasonSnowSearchMixin", "KaleidoscopeTaskMixin", "KaleidoscopeMotionMixin", "KaleidoscopeTubMixin", "KaleidoscopeBoardStandMixin", "MillstoneBindingMixin"
+    "SeasonSnowSearchMixin", "KaleidoscopeTaskMixin", "KaleidoscopeMotionMixin", "KaleidoscopeTubMixin", "KaleidoscopeBoardStandMixin", "MillstoneBindingMixin",
+    "TavernApproachMixin", "TavernWorkMixin", "TavernStateMixin", "TavernPreTickMixin",
+    "TavernTargetsMixin", "TavernOperationMixin", "TavernIngredientsMixin", "TavernGrapeMixin"
   ],
   "injectors": { "defaultRequire": 1 }
 }

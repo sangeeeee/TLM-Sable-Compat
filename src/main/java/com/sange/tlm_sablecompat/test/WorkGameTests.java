@@ -51,6 +51,8 @@ public class WorkGameTests {
         h.getLevel().setBlockAndUpdate(field,Blocks.FARMLAND.defaultBlockState());
         h.getLevel().setBlockAndUpdate(field.above(),Blocks.WHEAT.defaultBlockState().setValue(CropBlock.AGE,7));
         var farm=new TaskNormalFarm();m.setTask(farm);
+        // Mature wheat can randomly drop no seeds; this test checks replanting, not loot probability.
+        m.getMaidInv().setStackInSlot(0,new ItemStack(Items.WHEAT_SEEDS));
         m.setPos(Spaces.world(ship,Vec3.atBottomCenterOf(field.above())));
         m.getBrain().setMemory(InitEntities.TARGET_POS.get(),new BlockPosTracker(field));
         var action=new MaidFarmPlantTask(farm);
