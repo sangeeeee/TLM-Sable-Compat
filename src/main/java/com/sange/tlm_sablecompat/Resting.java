@@ -8,17 +8,11 @@ import net.minecraft.core.BlockPos;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.entity.*;
 import net.minecraft.world.phys.Vec3;
-import org.joml.Vector3d;
-import org.joml.Vector3f;
 
 public final class Resting {
     private Resting() {}
     public static final String KEY="tlm_sablecompat_attachment";
     public interface SeatData {
-        BlockPos compat$anchor();
-        Vector3f compat$offset();
-        float compat$yaw();
-        void compat$set(BlockPos pos,Vector3f offset,float yaw);
         void compat$associated(BlockPos pos);
     }
     private static Binding binding(Entity e) {
@@ -84,8 +78,13 @@ public final class Resting {
         if (!m.level().isClientSide() && s!=null) Spaces.teleportNear(m,s,pos.above().getCenter(),false);
         return true;
     }
+    public static float seatYaw(EntitySit seat) {
+        var s=Sable.HELPER.getContaining(seat.level(),seat.position());
+        if (s==null) return seat.getYRot();
+        Vec3 direction=s.logicalPose().transformNormal(seat.getLookAngle());
+        return (float)Math.toDegrees(Math.atan2(-direction.x,direction.z));
+    }
     public static void seat(EntitySit seat) {
-        SeatData data=(SeatData)seat;
         if (!seat.level().isClientSide()) {
             var level=(ServerLevel)seat.level();
             Binding b=binding(seat);
@@ -94,13 +93,13 @@ public final class Resting {
                 var s=Sable.HELPER.getContaining(level,anchor);
                 if (s==null) return;
                 attach(seat,anchor); b=binding(seat);
-                Vec3 offset=Spaces.local(s,seat.position()).subtract(Vec3.atLowerCornerOf(anchor));
-                Vector3d facing=s.logicalPose().orientation().transformInverse(new Vector3d(-Math.sin(Math.toRadians(seat.getYRot())),0,Math.cos(Math.toRadians(seat.getYRot()))));
-                float yaw=(float)Math.toDegrees(Math.atan2(-facing.x,facing.z));
+                // Retained seats live in plot coordinates. Sable projects their passengers/rendering.
+                Vec3 offset=seat.position().subtract(Vec3.atLowerCornerOf(anchor));
                 seat.getPersistentData().putDouble("SeatX",offset.x); seat.getPersistentData().putDouble("SeatY",offset.y); seat.getPersistentData().putDouble("SeatZ",offset.z);
-                seat.getPersistentData().putFloat("SeatYaw",yaw);
             }
-            if (b==null || !Homes.status(level,b).isEmpty()) {
+            String error=b==null ? "missing" : Homes.status(level,b);
+            boolean maidPassenger=seat.getPassengers().stream().anyMatch(e->e instanceof EntityMaid);
+            if (!error.isEmpty() && !(error.equals("tilted") && !maidPassenger)) {
                 seat.ejectPassengers(); seat.discard(); return;
             }
             BlockPos pos=b.points.getFirst().position();
@@ -111,16 +110,10 @@ public final class Resting {
                 seat.ejectPassengers(); seat.discard(); return;
             }
             var tag=seat.getPersistentData();
-            data.compat$set(pos,new Vector3f((float)tag.getDouble("SeatX"),(float)tag.getDouble("SeatY"),(float)tag.getDouble("SeatZ")),tag.getFloat("SeatYaw"));
-            data.compat$associated(pos);
+            ((SeatData)seat).compat$associated(pos);
+            seat.setPos(Vec3.atLowerCornerOf(pos).add(tag.getDouble("SeatX"),tag.getDouble("SeatY"),tag.getDouble("SeatZ")));
+            var s=Spaces.resolve(level,b.points.getFirst().structure());
+            for (Entity passenger:seat.getPassengers()) ((EntityMovementExtension)passenger).sable$setTrackingSubLevel(s);
         }
-        var s=Sable.HELPER.getContaining(seat.level(),data.compat$anchor());
-        if (s==null) return;
-        var off=data.compat$offset();
-        seat.setPos(Spaces.world(s,Vec3.atLowerCornerOf(data.compat$anchor()).add(off.x,off.y,off.z)));
-        Vector3d direction=s.logicalPose().orientation().transform(new Vector3d(-Math.sin(Math.toRadians(data.compat$yaw())),0,Math.cos(Math.toRadians(data.compat$yaw()))));
-        seat.setYRot((float)Math.toDegrees(Math.atan2(-direction.x,direction.z)));
-        ((EntityMovementExtension)seat).sable$setTrackingSubLevel(s);
-        for (Entity passenger:seat.getPassengers()) ((EntityMovementExtension)passenger).sable$setTrackingSubLevel(s);
     }
 }

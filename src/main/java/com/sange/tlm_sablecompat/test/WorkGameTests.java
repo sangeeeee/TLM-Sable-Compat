@@ -71,7 +71,12 @@ public class WorkGameTests {
         home(m);
         h.assertTrue(Work.blockAllowed(m,a.getPlot().getCenterBlock()) && !Work.blockAllowed(m,b.getPlot().getCenterBlock()),"Home must take priority over owner's selected structure");
         BlockPos isolated=a.getPlot().getCenterBlock().offset(12,0,3);h.getLevel().setBlockAndUpdate(isolated,Blocks.STONE.defaultBlockState());
-        h.assertTrue(!Work.reachable(m,isolated.above(),0),"Disconnected platform without a route must not count as reachable");
+        boolean reachable=Work.reachable(m,isolated.above(),0);
+        if (reachable) {
+            var path=m.getNavigation().createPath(isolated.above(),0);
+            TLMSableCompat.LOGGER.error("Unexpected island route: {}",path==null ? "null" : java.util.stream.IntStream.range(0,path.getNodeCount()).mapToObj(i->path.getNode(i).asBlockPos()+" floor="+h.getLevel().getBlockState(path.getNode(i).asBlockPos().below())).toList());
+        }
+        h.assertTrue(!reachable,"Disconnected platform without a route must not count as reachable");
         m.discard();CompatGameTests.cleanup(h,a,b);h.succeed();
     }
     @GameTest(templateNamespace="tlm_sablecompat",template="empty")
@@ -131,9 +136,9 @@ public class WorkGameTests {
         m.getBrain().setMemory(InitEntities.TARGET_POS.get(),new BlockPosTracker(pos));
         invoke(task,"start",new Class[]{ServerLevel.class,EntityMaid.class,long.class},h.getLevel(),m,0L);
         h.assertTrue(m.getVehicle() instanceof EntitySit,"Joy task must create and mount a seat");
-        var seat=(EntitySit)m.getVehicle();Resting.seat(seat);Vec3 old=Spaces.local(a,seat.position());
+        var seat=(EntitySit)m.getVehicle();Resting.seat(seat);Vec3 old=seat.position();
         a.logicalPose().position().add(40,0,10);a.logicalPose().orientation().rotateY(0.8);Resting.seat(seat);seat.positionRider(m);
-        h.assertTrue(seat.position().distanceTo(Spaces.world(a,old))<0.001 && m.position().distanceTo(seat.position())<2,"Seat and passenger must follow ship pose");
+        h.assertTrue(seat.position().distanceTo(old)<0.001 && m.position().distanceTo(Spaces.world(a,old))<2,"Retained seat stays local and Sable projects its passenger to world space");
         Navigation.state(m).activity=Activity.REST;Navigation.refresh(m);
         h.assertTrue(!m.isPassenger() && seat.isRemoved(),"Schedule change must dismount and release seat before commuting");
         m.discard();CompatGameTests.cleanup(h,a);h.succeed();

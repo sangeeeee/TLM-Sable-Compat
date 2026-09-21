@@ -21,6 +21,7 @@ public final class TLMSableCompat {
                 event.register(com.sange.tlm_sablecompat.test.WorkGameTests.class);
                 event.register(com.sange.tlm_sablecompat.test.FishingGameTests.class);
                 event.register(com.sange.tlm_sablecompat.test.PickupGameTests.class);
+                event.register(com.sange.tlm_sablecompat.test.JoyGameTests.class);
                 if (net.neoforged.fml.ModList.get().isLoaded("muhc"))
                     event.register(com.sange.tlm_sablecompat.test.HandCrankGameTests.class);
                 if (net.neoforged.fml.ModList.get().isLoaded("kaleidoscope_compat")

@@ -7,7 +7,7 @@
     "AssemblyMixin", "ContainerMixin", "CompassMixin", "HomeConfigMixin",
     "ScheduleMixin", "MaidMixin", "FollowMixin", "MoveSinkMixin", "NodeEvaluatorMixin",
     "BfsMixin", "WorkSearchMixin", "VehicleFollowMixin", "LookControlMixin", "HandCrankSearchMixin",
-    "BlockArrivalMixin", "PoiTasksMixin", "SeatMixin", "SleepMixin", "BedPositionMixin", "EntitySensorMixin", "RangedWalkMixin",
+    "BlockArrivalMixin", "PoiTasksMixin", "JoyTaskMixin", "SeatMixin", "SleepMixin", "BedPositionMixin", "EntitySensorMixin", "RangedWalkMixin",
     "FishingTaskMixin", "FishingHookMixin", "PickupTaskMixin", "PickupSensorMixin", "PickupMixin",
     "KitchenSearchMixin", "KitchenCookSearchMixin", "KitchenArrivalMixin", "KitchenContinuousMixin", "KitchenContainersMixin", "KitchenBerryPathMixin",
     "SeasonSnowSearchMixin", "KaleidoscopeTaskMixin", "KaleidoscopeMotionMixin", "KaleidoscopeTubMixin", "KaleidoscopeBoardStandMixin", "MillstoneBindingMixin"

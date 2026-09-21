@@ -72,7 +72,8 @@ public final class Work {
                 .flatMap(c -> manager.getInChunk(type,c,occupancy))
                 .filter(p -> p.getPos().distSqr(center) <= (double)radius * radius)
                 .filter(p -> blockAllowed(maid,p.getPos())).limit(64)
-                .filter(p -> reachable(maid,p.getPos(),1));
+                .filter(p -> level.getBlockState(p.getPos()).getBlock() instanceof com.github.tartaricacid.touhoulittlemaid.block.BlockJoy
+                        ? AddonWork.approach(maid,p.getPos(),3).allowed() : reachable(maid,p.getPos(),1));
     }
     public static AABB worldBox(SubLevel space, AABB local) {
         if (space == null) return local;
