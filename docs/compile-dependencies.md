@@ -10,6 +10,9 @@
 | Ecliptic Seasons | 0.15.0-rc-3-1 | [Modrinth](https://modrinth.com/mod/ecliptic-seasons/version/p7byuyzM) |
 | Ecliptic Seasons: MultiMod Patch | 0.32.1 | [CurseForge](https://www.curseforge.com/minecraft/mc-mods/ecliptic-seasons-multimod-patch/files/8813347) |
 | Create（MUHC 必需前置） | 6.0.10 | [Modrinth](https://modrinth.com/mod/create/version/UjX6dr61) |
+| Maidsoul Kitchen | 1.21.1-beta-v0.1.4 | [Modrinth](https://modrinth.com/mod/maidsoul-kitchen/version/JvPRj6e1) |
+| Farmer's Delight | 1.21.1-1.3.4 | [Modrinth](https://modrinth.com/mod/farmers-delight/version/XTVZDOol) |
+| Barbeque's Delight | 1.3.0 | [CurseForge](https://www.curseforge.com/minecraft/mc-mods/barbeques-delight/files/8004721) |
 
 `gradle.properties` 固定发布 ID；`build.gradle` 使用 `compatCompileOnly` 配置扩展 `compileOnly`。不依赖本机整合包路径，不加入默认运行依赖，不打包进本模组，也不新增安装时的强制依赖声明。
 
@@ -19,6 +22,11 @@
 - Create 内附 Flywheel `1.0.6`。
 - Create 内附 Ponder `1.0.82+mc1.21.1`。
 - MultiMod Patch 内附 MixinSquared `0.3.7-beta.1`。
+- Barbeque's Delight 内附 L2 Core `3.0.8+1`、L2 Modular Blocks `3.0.0+4`、L2 Serial `3.0.9+5`。
+
+Maidsoul Kitchen 和 Barbeque's Delight 也内附 Registrate `MC1.21-1.3.0+67`，其 SHA-256 与 Create 内附副本一致；提取时按文件名去重，只加入一份。上述内嵌库已检查，没有进一步的嵌套 JAR。
+
+Maidsoul Kitchen 的必需前置车万女仆已由基础依赖提供；Barbeque's Delight 的农夫乐事前置由本表提供。三个新模组及 L2 库都仅用于编译。
 
 必需前置车万女仆，以及 Minecraft、NeoForge 已由现有基础依赖提供，不重复声明。根据所选版本的发布元数据和 JAR 依赖声明，厨房、酒馆、节气没有其他必装独立模组；JEI、KubeJS、Create Connected 等可选联动不属于本次前置范围。
 

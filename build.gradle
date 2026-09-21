@@ -140,7 +140,8 @@ def extractCompatApis = tasks.register('extractCompatApis', Sync) {
     include 'META-INF/jarjar/*.jar'
     eachFile { path = name }
     includeEmptyDirs = false
-    duplicatesStrategy = DuplicatesStrategy.FAIL
+    // Create, Maidsoul Kitchen and Barbeque's Delight bundle the same pinned Registrate JAR.
+    duplicatesStrategy = DuplicatesStrategy.EXCLUDE
     into layout.buildDirectory.dir('compat-api')
 }
 neoForge.ideSyncTask extractCompatApis
@@ -165,6 +166,9 @@ dependencies {
     compatCompileOnly "maven.modrinth:ecliptic-seasons:${ecliptic_modrinth_version_id}"
     compatCompileOnly "curse.maven:ecliptic-seasons-multimod-patch-1316748:${ecliptic_patch_curse_file_id}"
     compatCompileOnly "maven.modrinth:create:${create_modrinth_version_id}"
+    compatCompileOnly "maven.modrinth:maidsoul-kitchen:${maidsoul_kitchen_modrinth_version_id}"
+    compatCompileOnly "maven.modrinth:farmers-delight:${farmers_delight_modrinth_version_id}"
+    compatCompileOnly "curse.maven:barbeques-delight-1007788:${barbeques_delight_curse_file_id}"
     compileOnly fileTree(layout.buildDirectory.dir('compat-api')) { include '*.jar' }.builtBy(extractCompatApis)
     // Optional regression profile, using user-supplied MUHC and Create jars (never bundled).
     if (providers.gradleProperty('muhcTestJar').isPresent()) {
