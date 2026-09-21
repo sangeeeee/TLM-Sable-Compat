@@ -33,6 +33,98 @@ public class AddonGameTests {
     }
     static void target(EntityMaid m,BlockPos p) { m.getBrain().setMemory(InitEntities.TARGET_POS.get(),new BlockPosTracker(p)); }
 
+    private static void raisedBoards(GameTestHelper h,boolean structure) throws ReflectiveOperationException {
+        var s=structure ? CompatGameTests.platform(h,1) : null;
+        var m=structure ? CompatGameTests.maid(h,s) : new EntityMaid(h.getLevel());
+        BlockPos floor=structure ? s.getPlot().getCenterBlock().offset(3,0,3) : h.absolutePos(new BlockPos(4,2,4));
+        if (!structure) {
+            for(BlockPos p:BlockPos.betweenClosed(floor.offset(-3,0,-3),floor.offset(3,0,3))) h.getLevel().setBlock(p,Blocks.STONE.defaultBlockState(),2);
+            m.setPos(Vec3.atBottomCenterOf(floor.above()));h.getLevel().addFreshEntity(m);
+        }
+        home(m);
+        if (structure) { s.logicalPose().position().add(30,0,20);s.logicalPose().orientation().rotateY(.8).rotateX(.08).rotateZ(.05); }
+        BlockPos p=floor.offset(1,2,0);put(h,p.below(),"minecraft:stone");
+        Vec3 stand=Vec3.atBottomCenterOf(floor.above());
+        m.setPos(Spaces.world(s,stand));
+        var task=TaskManager.findTask(id("kaleidoscope_compat:chopping_board")).orElseThrow();m.setTask(task);
+        put(h,p,"kaleidoscope_cookery:chopping_board");
+        m.getMaidInv().setStackInSlot(0,new ItemStack(Items.COD,2));
+        m.setItemInHand(InteractionHand.MAIN_HAND,new ItemStack(BuiltInRegistries.ITEM.get(id("kaleidoscope_cookery:iron_kitchen_knife"))));
+        var b=task.createBrainTasks(m).getFirst().getSecond();
+        m.setPos(Spaces.world(s,stand.add(-2,0,0)));
+        m.setOnGround(true);
+        h.assertTrue((boolean)call(b,"checkExtraStartConditions",h,m,false),"Raised chopping board must be found from adjacent ground");
+        var destination=m.getBrain().getMemory(MemoryModuleType.WALK_TARGET).orElseThrow().getTarget().currentBlockPosition();
+        h.assertTrue(destination.getY()==floor.getY()+1,"Raised board must offer a standing point on ground, not an airborne point at counter height");
+        call(b,"start",h,m,true);
+        h.assertTrue((boolean)call(b,"canStillUse",h,m,true),"Raised board must not abort while approaching");
+        m.setPos(Spaces.world(s,stand));
+        h.assertTrue(AddonWork.canInteract(m,p,1),"Raised interaction: visible="+AddonWork.visible(m,p)+", range="+AddonWork.boardRange(AddonWork.position(m),p)+", allowed="+Work.blockAllowed(m,p)+", feet="+AddonWork.position(m)+", eye="+Spaces.local(s,m.getEyePosition())+", board="+p);
+        call(b,"tick",h,m,true);call(b,"tick",h,m,true);
+        var board=(com.github.ysbbbbbb.kaleidoscopecookery.blockentity.kitchen.ChoppingBoardBlockEntity)h.getLevel().getBlockEntity(p);
+        h.assertTrue(board.getCurrentCutCount()>0,"Maid must insert and cut on counter without jumping onto it");
+        put(h,p,"farmersdelight:cutting_board");m.getBrain().eraseMemory(MemoryModuleType.WALK_TARGET);
+        task=TaskManager.findTask(id("maidsoulkitchen:fd_cutting_board")).orElseThrow();m.setTask(task);
+        m.getMaidInv().setStackInSlot(0,new ItemStack(Items.ACACIA_LOG,2));m.getMaidInv().setStackInSlot(1,new ItemStack(Items.IRON_AXE));
+        var tasks=task.createBrainTasks(m);var action=tasks.get(1).getSecond();
+        call(tasks.getFirst().getSecond(),"searchForDestination",h,m,false);
+        h.assertTrue((boolean)call(action,"checkExtraStartConditions",h,m,false),"Raised FD board must allow horizontal and vertical neighbour together");
+        call(action,"start",h,m,true);call(action,"tick",h,m,true);
+        var fd=(vectorwing.farmersdelight.common.block.entity.CuttingBoardBlockEntity)h.getLevel().getBlockEntity(p);
+        h.assertTrue(fd.getStoredItem().is(Items.ACACIA_LOG),"Raised FD board must receive the ingredient");
+        for(int i=0;i<5;i++) call(action,"tick",h,m,true);
+        h.assertTrue(fd.getStoredItem().isEmpty(),"Raised FD board must complete actual cutting");
+        m.setPos(Spaces.world(s,stand.add(-1,0,0)));target(m,p);
+        h.assertTrue(!(boolean)call(action,"checkExtraStartConditions",h,m,false),"Two cells away must be outside board range");
+        m.discard();if(structure) CompatGameTests.cleanup(h,s);h.succeed();
+    }
+    @GameTest(templateNamespace="tlm_sablecompat",template="empty")
+    public static void raisedBoardsInWorld(GameTestHelper h) throws ReflectiveOperationException { raisedBoards(h,false); }
+    @GameTest(templateNamespace="tlm_sablecompat",template="empty")
+    public static void raisedBoardsOnTiltedStructure(GameTestHelper h) throws ReflectiveOperationException { raisedBoards(h,true); }
+
+    @GameTest(templateNamespace="tlm_sablecompat",template="empty")
+    public static void slabFloorBlocksWork(GameTestHelper h) throws ReflectiveOperationException {
+        var s=CompatGameTests.platform(h,1);var m=CompatGameTests.maid(h,s);home(m);
+        s.logicalPose().orientation().rotateY(.7).rotateX(.08);
+        BlockPos p=s.getPlot().getCenterBlock().offset(4,1,3);
+        var task=TaskManager.findTask(id("kaleidoscope_compat:chopping_board")).orElseThrow();m.setTask(task);
+        put(h,p,"kaleidoscope_cookery:chopping_board");
+        m.setPos(Spaces.world(s,Vec3.atBottomCenterOf(p.west())));
+        m.getMaidInv().setStackInSlot(0,new ItemStack(Items.COD,2));
+        var b=task.createBrainTasks(m).getFirst().getSecond();
+        h.assertTrue((boolean)call(b,"checkExtraStartConditions",h,m,false),"Start at accessible board");call(b,"start",h,m,true);
+        var slab=Blocks.STONE_SLAB.defaultBlockState();
+        for(BlockPos q:BlockPos.betweenClosed(p.offset(-2,1,-2),p.offset(2,1,2))) h.getLevel().setBlock(q,slab,2);
+        Vec3 upper=Vec3.atBottomCenterOf(p.west().above()).add(0,.5,0);m.setPos(Spaces.world(s,upper));
+        h.assertTrue(AddonWork.boardRange(AddonWork.position(m),p),"This regression must be inside distance range, not rejected just for distance");
+        h.assertTrue(!AddonWork.visible(m,p),"Bottom slab floor must obstruct the actual interaction ray");
+        call(b,"tick",h,m,true);
+        var board=(com.github.ysbbbbbb.kaleidoscopecookery.blockentity.kitchen.ChoppingBoardBlockEntity)h.getLevel().getBlockEntity(p);
+        h.assertTrue(board.getCurrentCutStack().isEmpty(),"Chopping task must not insert ingredients through the floor");
+        for(var state:List.of(slab.setValue(net.minecraft.world.level.block.SlabBlock.TYPE,net.minecraft.world.level.block.state.properties.SlabType.TOP),Blocks.STONE.defaultBlockState())) {
+            for(BlockPos q:BlockPos.betweenClosed(p.offset(-2,1,-2),p.offset(2,1,2))) h.getLevel().setBlock(q,state,2);
+            m.setPos(Spaces.world(s,Vec3.atBottomCenterOf(p.west().above(2))));
+            h.assertTrue(!AddonWork.visible(m,p),"Top slabs and full blocks must also obstruct work");
+        }
+        for(BlockPos q:BlockPos.betweenClosed(p.offset(-2,1,-2),p.offset(2,1,2))) h.getLevel().setBlock(q,Blocks.AIR.defaultBlockState(),2);
+        m.setPos(Spaces.world(s,Vec3.atBottomCenterOf(p.west())));call(b,"tick",h,m,true);
+        h.assertTrue(!board.getCurrentCutStack().isEmpty(),"Work must resume when standing beside the board without an obstruction");
+        // A cooking task has a larger native interaction radius: obstruction must win over that radius too.
+        put(h,p,"farmersdelight:cutting_board");
+        task=TaskManager.findTask(id("maidsoulkitchen:fd_cutting_board")).orElseThrow();m.setTask(task);
+        m.getMaidInv().setStackInSlot(0,new ItemStack(Items.ACACIA_LOG,2));m.getMaidInv().setStackInSlot(1,new ItemStack(Items.IRON_AXE));
+        var tasks=task.createBrainTasks(m);var action=tasks.get(1).getSecond();
+        call(tasks.getFirst().getSecond(),"searchForDestination",h,m,false);call(action,"start",h,m,true);
+        for(BlockPos q:BlockPos.betweenClosed(p.offset(-2,1,-2),p.offset(2,1,2))) h.getLevel().setBlock(q,slab,2);
+        m.setPos(Spaces.world(s,upper));
+        h.assertTrue(!(boolean)call(action,"checkExtraStartConditions",h,m,false),"Kitchen arrival must reject a board through a slab");
+        h.assertTrue(!(boolean)call(action,"canStillUse",h,m,true),"Kitchen continuous task must stop when a floor intervenes");
+        call(action,"tick",h,m,true);
+        h.assertTrue(((vectorwing.farmersdelight.common.block.entity.CuttingBoardBlockEntity)h.getLevel().getBlockEntity(p)).getStoredItem().isEmpty(),"Kitchen tick must not insert through slab even with a cached target");
+        m.discard();CompatGameTests.cleanup(h,s);h.succeed();
+    }
+
     @GameTest(templateNamespace="tlm_sablecompat",template="empty")
     public static void registeredTasks(GameTestHelper h) {
         var ids=TaskManager.getTaskMap().keySet().stream().filter(r->Set.of("maidsoulkitchen","kaleidoscope_compat","eclipticseasons_multimodpatch").contains(r.getNamespace())).sorted().toList();

@@ -22,16 +22,25 @@ public class KitchenArrivalMixin {
         // address while travelling instead of requiring WALK_TARGET == TARGET_POS.
         double range=m.getTask() instanceof com.github.wallev.maidsoulkitchen.api.task.v1.cook.ICookTask<?,?> cook ? cook.getCloseEnoughDist()
                 : m.getTask() instanceof com.github.wallev.maidsoulkitchen.api.task.v1.farm.ICompatFarm<?,?> farm ? farm.getCloseEnoughDist() : 0;
+        var work=m.getBrain().getMemory(com.github.tartaricacid.touhoulittlemaid.init.InitEntities.TARGET_POS.get());
+        if (work.isPresent() && AddonWork.board(m,work.get().currentBlockPosition())) {
+            cir.setReturnValue(AddonWork.targetInteractable(m,range));return;
+        }
         if (Work.active(m) && range>0 && m.getBrain().hasMemoryValue(net.minecraft.world.entity.ai.memory.MemoryModuleType.WALK_TARGET)) {
             var target=m.getBrain().getMemory(com.github.tartaricacid.touhoulittlemaid.init.InitEntities.TARGET_POS.get());
             if(target.isPresent() && Work.blockAllowed(m,target.get().currentBlockPosition())
-                    && Work.distance(m,target.get().currentPosition())>range*range) cir.setReturnValue(false);
+                    && !AddonWork.targetInteractable(m,range)) cir.setReturnValue(false);
         }
     }
     @Redirect(method="*",at=@At(value="INVOKE",target="Lcom/github/tartaricacid/touhoulittlemaid/entity/passive/EntityMaid;distanceToSqr(Lnet/minecraft/world/phys/Vec3;)D"))
-    private double distance(EntityMaid m,Vec3 target) { return Work.distance(m,target); }
+    private double distance(EntityMaid m,Vec3 target) {
+        return Work.active(m) && !AddonWork.visible(m,net.minecraft.core.BlockPos.containing(target)) ? Double.POSITIVE_INFINITY : Work.distance(m,target);
+    }
     @Inject(method="start(Lnet/minecraft/server/level/ServerLevel;Lcom/github/tartaricacid/touhoulittlemaid/entity/passive/EntityMaid;J)V",at=@At("HEAD"),cancellable=true)
     private void start(ServerLevel level,EntityMaid m,long time,CallbackInfo ci) {
-        if (!AddonWork.targetValid(m)) ci.cancel();
+        var target=m.getBrain().getMemory(com.github.tartaricacid.touhoulittlemaid.init.InitEntities.TARGET_POS.get());
+        if (!AddonWork.targetValid(m) || target.isPresent() &&
+                (AddonWork.board(m,target.get().currentBlockPosition()) ? !AddonWork.targetInteractable(m,1)
+                        : Work.active(m) && !AddonWork.visible(m,target.get().currentBlockPosition()))) ci.cancel();
     }
 }

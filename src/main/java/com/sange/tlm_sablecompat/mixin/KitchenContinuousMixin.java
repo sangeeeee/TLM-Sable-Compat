@@ -16,15 +16,18 @@ import org.spongepowered.asm.mixin.injection.callback.*;
 public class KitchenContinuousMixin {
     @Unique private boolean tlmsc$valid(EntityMaid m) {
         double range=m.getTask() instanceof com.github.wallev.maidsoulkitchen.api.task.v1.cook.ICookTask<?,?> task ? task.getCloseEnoughDist() : 3.2;
-        return m.getBrain().getMemory(InitEntities.TARGET_POS.get())
-                .map(t -> Work.distance(m,t.currentPosition())<=range*range).orElse(false);
+        return AddonWork.targetInteractable(m,range);
+    }
+    @Unique private boolean tlmsc$checked(EntityMaid m) {
+        return Work.active(m) || m.getBrain().getMemory(InitEntities.TARGET_POS.get())
+                .map(t->AddonWork.board(m,t.currentBlockPosition())).orElse(false);
     }
     @Inject(method="canStillUse(Lnet/minecraft/server/level/ServerLevel;Lcom/github/tartaricacid/touhoulittlemaid/entity/passive/EntityMaid;J)Z",at=@At("HEAD"),cancellable=true)
     private void use(ServerLevel level,EntityMaid m,long time,CallbackInfoReturnable<Boolean> cir) {
-        if (!AddonWork.targetValid(m) || Work.active(m) && !tlmsc$valid(m)) cir.setReturnValue(false);
+        if (!AddonWork.targetValid(m) || tlmsc$checked(m) && !tlmsc$valid(m)) cir.setReturnValue(false);
     }
     @Inject(method="tick(Lnet/minecraft/server/level/ServerLevel;Lcom/github/tartaricacid/touhoulittlemaid/entity/passive/EntityMaid;J)V",at=@At("HEAD"),cancellable=true)
     private void tick(ServerLevel level,EntityMaid m,long time,CallbackInfo ci) {
-        if (!AddonWork.targetValid(m) || Work.active(m) && !tlmsc$valid(m)) ci.cancel();
+        if (!AddonWork.targetValid(m) || tlmsc$checked(m) && !tlmsc$valid(m)) ci.cancel();
     }
 }

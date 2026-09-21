@@ -31,10 +31,12 @@ public class KaleidoscopeTaskMixin {
     private void use(ServerLevel level,EntityMaid m,long time,CallbackInfoReturnable<Boolean> cir) {
         if (currentWorkPos!=null && !Work.blockAllowed(m,currentWorkPos)) cir.setReturnValue(false);
         // The original close-distance condition aborts the task before the maid finishes walking.
-        else if (Work.active(m)) cir.setReturnValue(currentWorkPos!=null && level.getBlockEntity(currentWorkPos)!=null);
+        else if (Work.active(m) || (Object)this instanceof com.bmt.kaleidoscope_compat.compat.touhoulittlemaid.MaidChoppingBoardBehavior)
+            cir.setReturnValue(currentWorkPos!=null && level.getBlockEntity(currentWorkPos)!=null);
     }
     @Inject(method="tick(Lnet/minecraft/server/level/ServerLevel;Lcom/github/tartaricacid/touhoulittlemaid/entity/passive/EntityMaid;J)V",at=@At("HEAD"),cancellable=true)
     private void tick(ServerLevel level,EntityMaid m,long time,CallbackInfo ci) {
-        if (currentWorkPos==null || !Work.blockAllowed(m,currentWorkPos)) ci.cancel();
+        if (currentWorkPos==null || !Work.blockAllowed(m,currentWorkPos)
+                || Work.active(m) && !AddonWork.board(m,currentWorkPos) && !AddonWork.visible(m,currentWorkPos)) ci.cancel();
     }
 }

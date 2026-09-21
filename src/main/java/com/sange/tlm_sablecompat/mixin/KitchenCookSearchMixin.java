@@ -22,12 +22,12 @@ public class KitchenCookSearchMixin {
     @Inject(method="shouldMoveTo",at=@At("HEAD"),cancellable=true)
     private void reachable(ServerLevel level,EntityMaid m,BlockPos pos,CallbackInfoReturnable<Boolean> cir) {
         // Only pathfind for block entities, before the recipe manager takes ingredients from containers.
-        if (Work.active(m) && (level.getBlockEntity(pos)==null || !task.isCookBE(level.getBlockEntity(pos))
+        if ((Work.active(m) || AddonWork.board(m,pos)) && (level.getBlockEntity(pos)==null || !task.isCookBE(level.getBlockEntity(pos))
                 || !AddonWork.approach(m,pos,task.getCloseEnoughDist()).allowed())) cir.setReturnValue(false);
     }
     @Inject(method="setWalkAndLookTargetMemories",at=@At("HEAD"),cancellable=true)
     private static void walk(LivingEntity entity,BlockPos walk,BlockPos look,float speed,int distance,CallbackInfo ci) {
-        if (!(entity instanceof EntityMaid m) || !Work.active(m)) return;
+        if (!(entity instanceof EntityMaid m) || !Work.active(m) && !AddonWork.board(m,look)) return;
         double reach=m.getTask() instanceof ICookTask<?,?> task ? task.getCloseEnoughDist() : 3.2;
         var approach=AddonWork.approach(m,look,reach);
         if(!approach.allowed()) { ci.cancel();return; }

@@ -10,5 +10,8 @@ import org.spongepowered.asm.mixin.injection.*;
 @Mixin(value={MaidArriveAtBlockTask.class,MaidFarmPlantTask.class,MaidTorchPlaceTask.class,MaidStealEdibleUseTask.class},remap=false)
 public class BlockArrivalMixin {
     @Redirect(method="*",at=@At(value="INVOKE",target="Lcom/github/tartaricacid/touhoulittlemaid/entity/passive/EntityMaid;distanceToSqr(Lnet/minecraft/world/phys/Vec3;)D"))
-    private static double blockDistance(EntityMaid maid, Vec3 point) { return Work.distance(maid,point); }
+    private static double blockDistance(EntityMaid maid, Vec3 point) {
+        return Work.active(maid) && !com.sange.tlm_sablecompat.AddonWork.visible(maid,net.minecraft.core.BlockPos.containing(point))
+                ? Double.POSITIVE_INFINITY : Work.distance(maid,point);
+    }
 }
