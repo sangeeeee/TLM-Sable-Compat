@@ -37,6 +37,8 @@
 
 构建会自动下载所需模组依赖。输出文件位于 `build/libs/tlm_sablecompat-neoforge-1.21.1-0.0.1-beta.jar`。
 
+厨房、酒馆、女仆摇曲柄、节气及其多维修补已添加为仅编译依赖，版本及前置见 [附属任务编译依赖](docs/compile-dependencies.md)。
+
 运行使用实际 Sable 和女仆模组的服务器集成测试：
 
 ```shell

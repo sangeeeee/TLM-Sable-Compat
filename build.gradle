@@ -29,6 +29,11 @@ sourceSets.main.resources {
 
 repositories {
     maven {
+        name = 'Modrinth'
+        url = 'https://api.modrinth.com/maven'
+        content { includeGroup 'maven.modrinth' }
+    }
+    maven {
         name = 'CurseMaven'
         url = 'https://cursemaven.com'
         content {
@@ -121,7 +126,24 @@ neoForge {
 configurations {
     runtimeClasspath.extendsFrom localRuntime
     sableArchive
+    compatCompileOnly {
+        canBeConsumed = false
+        transitive = false
+    }
+    compileOnly.extendsFrom compatCompileOnly
 }
+
+// Jar-in-jar libraries are not visible to javac through the outer mod JAR.
+// Use the exact bundled versions, without adding them to runtime or our own JAR.
+def extractCompatApis = tasks.register('extractCompatApis', Sync) {
+    from({ configurations.compatCompileOnly.collect { zipTree(it) } })
+    include 'META-INF/jarjar/*.jar'
+    eachFile { path = name }
+    includeEmptyDirs = false
+    duplicatesStrategy = DuplicatesStrategy.FAIL
+    into layout.buildDirectory.dir('compat-api')
+}
+neoForge.ideSyncTask extractCompatApis
 
 tasks.register('extractSableApi', Copy) {
     from({ zipTree(configurations.sableArchive.singleFile) })
@@ -136,6 +158,14 @@ dependencies {
     implementation "curse.maven:sable-1312371:${sable_curse_file_id}"
     sableArchive "curse.maven:sable-1312371:${sable_curse_file_id}"
     compileOnly fileTree(layout.buildDirectory.dir('sable-api')) { include '*.jar' }
+    // Optional task integrations: pinned NeoForge 1.21.1 artifacts, compile classpath only.
+    compatCompileOnly "maven.modrinth:kaleidoscope-cookery:${cookery_modrinth_version_id}"
+    compatCompileOnly "maven.modrinth:kaleidoscopetavern:${tavern_modrinth_version_id}"
+    compatCompileOnly "maven.modrinth:maidusehandcrank:${muhc_modrinth_version_id}"
+    compatCompileOnly "maven.modrinth:ecliptic-seasons:${ecliptic_modrinth_version_id}"
+    compatCompileOnly "curse.maven:ecliptic-seasons-multimod-patch-1316748:${ecliptic_patch_curse_file_id}"
+    compatCompileOnly "maven.modrinth:create:${create_modrinth_version_id}"
+    compileOnly fileTree(layout.buildDirectory.dir('compat-api')) { include '*.jar' }.builtBy(extractCompatApis)
     // Optional regression profile, using user-supplied MUHC and Create jars (never bundled).
     if (providers.gradleProperty('muhcTestJar').isPresent()) {
         localRuntime files(providers.gradleProperty('muhcTestJar').get())
