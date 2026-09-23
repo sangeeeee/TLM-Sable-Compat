@@ -106,6 +106,7 @@ public final class Resting {
             // Block replacement is a lifecycle change even when the replacement has collision.
             var block=level.getBlockState(pos).getBlock();
             if (!(block instanceof com.github.tartaricacid.touhoulittlemaid.block.BlockJoy)
+                    && !(block instanceof com.github.tartaricacid.touhoulittlemaid.block.BlockPicnicMat)
                     && !(block instanceof com.github.tartaricacid.touhoulittlemaid.api.block.IBoardGameBlock)) {
                 seat.ejectPassengers(); seat.discard(); return;
             }

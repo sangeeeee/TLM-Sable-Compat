@@ -22,6 +22,7 @@ public final class TLMSableCompat {
                 event.register(com.sange.tlm_sablecompat.test.FishingGameTests.class);
                 event.register(com.sange.tlm_sablecompat.test.PickupGameTests.class);
                 event.register(com.sange.tlm_sablecompat.test.JoyGameTests.class);
+                event.register(com.sange.tlm_sablecompat.test.PicnicGameTests.class);
                 event.register(com.sange.tlm_sablecompat.test.NavigationGameTests.class);
                 if (net.neoforged.fml.ModList.get().isLoaded("tlm_maid_manager"))
                     event.register(com.sange.tlm_sablecompat.test.ManagerGameTests.class);
