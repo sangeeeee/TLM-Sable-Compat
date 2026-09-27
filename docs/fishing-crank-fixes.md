@@ -1,4 +1,4 @@
-# 钓鱼与曲柄任务修复（0.0.1-beta）
+# 钓鱼与曲柄任务修复（1.0.1-beta）
 
 分析及测试对象：Touhou Little Maid 1.5.3、Sable 2.0.5、MaidUseHandCrank 1.6.2、Create 6.0.10。
 

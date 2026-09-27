@@ -38,6 +38,37 @@ public class CompatGameTests {
         return net.neoforged.neoforge.common.util.FakePlayerFactory.get(h.getLevel(),
                 new com.mojang.authlib.GameProfile(UUID.randomUUID(), "compat-test"));
     }
+    static net.neoforged.neoforge.network.handling.IPayloadContext payloadContext(ServerPlayer player) {
+        var type = net.neoforged.neoforge.network.handling.IPayloadContext.class;
+        return (net.neoforged.neoforge.network.handling.IPayloadContext)java.lang.reflect.Proxy.newProxyInstance(
+                type.getClassLoader(), new Class[]{type}, (proxy, method, args) -> switch (method.getName()) {
+                    case "player" -> player;
+                    case "flow" -> net.minecraft.network.protocol.PacketFlow.SERVERBOUND;
+                    case "enqueueWork" -> {
+                        if (args[0] instanceof Runnable work) {
+                            work.run(); yield java.util.concurrent.CompletableFuture.completedFuture(null);
+                        }
+                        yield java.util.concurrent.CompletableFuture.completedFuture(((java.util.function.Supplier<?>)args[0]).get());
+                    }
+                    default -> throw new UnsupportedOperationException(method.getName());
+                });
+    }
+    static void homePacket(ServerPlayer owner, EntityMaid maid, boolean enabled) {
+        if (maid.level().getEntity(maid.getId()) != maid) throw new AssertionError("Test maid must remain visible to the packet's entity lookup");
+        var packet = new com.github.tartaricacid.touhoulittlemaid.network.message.MaidConfigPackage(
+                maid.getId(), enabled, maid.isPickup(), maid.isRideable(), maid.getSchedule());
+        // Use the registered entry point: Maid Manager replaces it and bypasses handleHome.
+        com.github.tartaricacid.touhoulittlemaid.network.message.MaidConfigPackage.handle(packet, payloadContext(owner));
+    }
+    static void bindThreePoints(ServerPlayer owner, EntityMaid maid, BlockPos floor) {
+        ItemStack compass = new ItemStack(InitItems.KAPPA_COMPASS.get());
+        owner.setItemInHand(InteractionHand.MAIN_HAND, compass);
+        for (BlockPos point : List.of(floor, floor.east(2), floor.south(2))) {
+            compass.getItem().useOn(new UseOnContext(owner, InteractionHand.MAIN_HAND,
+                    new BlockHitResult(point.getCenter(), Direction.UP, point, false)));
+        }
+        compass.interactLivingEntity(owner, maid, InteractionHand.MAIN_HAND);
+    }
     static ServerSubLevel platform(GameTestHelper h, int offset) {
         var blocks = new ArrayList<BlockPos>();
         BlockPos origin = h.absolutePos(new BlockPos(offset, 3, 1));
@@ -165,6 +196,65 @@ public class CompatGameTests {
         item.interactLivingEntity(compass,player,m,InteractionHand.MAIN_HAND);
         h.assertTrue(bound.equals(Homes.id(m)),"Rejected binding must preserve old Home");
         m.discard(); cleanup(h,a,b); h.succeed();
+    }
+    @GameTest(templateNamespace = "tlm_sablecompat", template = "empty")
+    public static void threePointCompassHomeThroughPublicPacket(GameTestHelper h) {
+        var ship = platform(h, 1); var maid = maid(h, ship); var owner = player(h);
+        maid.tame(owner); OWNERS.put(maid, owner);
+        BlockPos floor = ship.getPlot().getCenterBlock().offset(2, 0, 2);
+        try {
+            bindThreePoints(owner, maid, floor);
+            UUID binding = Homes.id(maid);
+            h.assertTrue(Homes.managed(maid) && Homes.binding(maid).points.size() == 3 && !maid.isHomeModeEnable(),
+                    "Three areas must bind successfully while Home remains disabled");
+            h.assertTrue(Homes.validateMaid(maid, Homes.binding(maid)).isEmpty(), "Maid is near her local areas");
+            homePacket(owner, maid, true);
+            h.assertTrue(maid.isHomeModeEnable(), "Public GUI packet must enable nearby structure Home, including with Maid Manager loaded");
+            homePacket(owner, maid, false);
+            h.assertTrue(!maid.isHomeModeEnable(), "GUI must still disable Home");
+            // Stay in GameTest's loaded entity sections so the public packet can look up the maid.
+            ship.logicalPose().position().add(8, 0, 4);
+            ship.logicalPose().orientation().rotateY(1.2);
+            maid.setPos(Spaces.world(ship, Vec3.atBottomCenterOf(floor.south(2).above())));
+            h.assertTrue(maid.getSchedulePos().getNearestPos(maid).equals(
+                    BlockPos.containing(Spaces.world(ship, floor.south(2).getCenter()))),
+                    "Nearest-point query must choose and project the nearest area using the current pose");
+            homePacket(owner, maid, true);
+            h.assertTrue(maid.isHomeModeEnable(), "Moving and rotating the ship must not break Home enabling");
+            h.assertTrue(binding.equals(Homes.id(maid)) && maid.getSchedulePos().getWorkPos().equals(floor)
+                    && maid.getSchedulePos().getIdlePos().equals(floor.east(2))
+                    && maid.getSchedulePos().getSleepPos().equals(floor.south(2)), "Distance checks must not overwrite local activity addresses");
+            homePacket(owner, maid, false);
+            // Move the target away; keep the maid in a loaded section for the rejection check.
+            ship.logicalPose().position().add(80, 0, 0);
+            homePacket(owner, maid, true);
+            h.assertTrue(!maid.isHomeModeEnable(), "A genuinely distant maid must still fail the existing proximity check");
+        } finally { maid.discard(); cleanup(h, ship); }
+        h.succeed();
+    }
+    @GameTest(templateNamespace = "tlm_sablecompat", template = "empty")
+    public static void ordinaryCompassHomeThroughPublicPacket(GameTestHelper h) {
+        var owner = player(h); var maid = new EntityMaid(h.getLevel()) {
+            @Override public net.minecraft.world.entity.LivingEntity getOwner() { return owner; }
+        };
+        BlockPos floor = h.absolutePos(new BlockPos(3, 3, 3));
+        for (BlockPos point : List.of(floor, floor.east(2), floor.south(2)))
+            h.getLevel().setBlockAndUpdate(point, Blocks.STONE.defaultBlockState());
+        maid.setPos(Vec3.atBottomCenterOf(floor.above())); maid.tame(owner); h.getLevel().addFreshEntity(maid);
+        try {
+            bindThreePoints(owner, maid, floor);
+            h.assertTrue(maid.getSchedulePos().getNearestPos(maid).equals(floor), "World compass query retains world coordinates");
+            homePacket(owner, maid, true);
+            h.assertTrue(maid.isHomeModeEnable(), "Nearby world Home must still enable through the GUI packet");
+            homePacket(owner, maid, false);
+            maid.getPersistentData().remove(Homes.KEY);
+            maid.getSchedulePos().setWorkPos(floor.east(80));
+            maid.getSchedulePos().setIdlePos(floor.east(82));
+            maid.getSchedulePos().setSleepPos(floor.east(80).south(2));
+            homePacket(owner, maid, true);
+            h.assertTrue(!maid.isHomeModeEnable(), "World Home must retain the native distance limit");
+        } finally { maid.discard(); }
+        h.succeed();
     }
     @GameTest(templateNamespace = "tlm_sablecompat", template = "empty")
     public static void waitPreservesOtherWork(GameTestHelper h) {

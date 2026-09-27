@@ -6,7 +6,7 @@
 
 Sable 将飞艇等可移动物理结构保存在独立空间中。方块使用结构内部坐标，玩家和女仆实体则显示在普通世界坐标中。没有兼容时，女仆可能朝错误方向寻路、找不到随船移动的 Home 和工作方块，或把另一个空间中的目标当成附近目标。本模组让跟随、Home、工作、休闲、睡眠和通勤使用正确的空间与坐标。
 
-当前版本：`0.0.1-beta`<br>
+当前版本：`1.0.1-beta`<br>
 支持环境：Minecraft `1.21.1`、NeoForge `21.1.248+`<br>
 已验证：Touhou Little Maid `1.5.3`、Sable `2.0.5`
 
@@ -128,7 +128,7 @@ Sable 将飞艇等可移动物理结构保存在独立空间中。方块使用�
 ./gradlew runGameTestServer
 ```
 
-成品位于 `build/libs/tlm_sablecompat-neoforge-1.21.1-0.0.1-beta.jar`。
+成品位于 `build/libs/tlm_sablecompat-neoforge-1.21.1-1.0.1-beta.jar`。
 
 ---
 
@@ -140,7 +140,7 @@ TLM Sable Compat is a Minecraft NeoForge add-on for [Touhou Little Maid](https:/
 
 Sable stores moving physical structures such as airships in separate spaces. Blocks use structure-local coordinates while players and maids appear at projected world coordinates. Without an adapter, a maid may walk in the wrong direction, lose a moving Home or workstation, or treat a target in another space as nearby. This mod makes following, Home, work, leisure, sleep, and commuting use the correct space and coordinates.
 
-Current version: `0.0.1-beta`<br>
+Current version: `1.0.1-beta`<br>
 Supported environment: Minecraft `1.21.1`, NeoForge `21.1.248+`<br>
 Tested with: Touhou Little Maid `1.5.3`, Sable `2.0.5`
 
@@ -260,4 +260,4 @@ Use Java 21:
 ./gradlew runGameTestServer
 ```
 
-The output is `build/libs/tlm_sablecompat-neoforge-1.21.1-0.0.1-beta.jar`.
+The output is `build/libs/tlm_sablecompat-neoforge-1.21.1-1.0.1-beta.jar`.

@@ -27,6 +27,31 @@ import java.util.*;
 
 @PrefixGameTestTemplate(false)
 public class ManagerGameTests {
+    @GameTest(templateNamespace="tlm_sablecompat", template="empty")
+    public static void compassHomeThroughManagerTablet(GameTestHelper h) {
+        var ship = CompatGameTests.platform(h, 1); var maid = CompatGameTests.maid(h, ship);
+        var owner = CompatGameTests.player(h); maid.tame(owner); CompatGameTests.OWNERS.put(maid, owner);
+        BlockPos floor = ship.getPlot().getCenterBlock().offset(2, 0, 2);
+        try {
+            CompatGameTests.bindThreePoints(owner, maid, floor);
+            h.assertTrue(Homes.managed(maid) && !maid.isHomeModeEnable(), "Compass must bind before enabling Home");
+            UUID binding = Homes.id(maid); Vec3 local = Spaces.local(ship, maid.position());
+            move(h, ship); maid.setPos(Spaces.world(ship, local));
+            owner.setItemInHand(InteractionHand.MAIN_HAND, InitItems.MAID_MANAGER.get().getDefaultInstance());
+            boolean pickup = !maid.isPickup();
+            com.hmtl.tlmmaidmanager.network.message.SetMaidConfigPacket.handle(
+                    new com.hmtl.tlmmaidmanager.network.message.SetMaidConfigPacket(maid.getUUID(), true, pickup, maid.isRideable(), -1),
+                    CompatGameTests.payloadContext(owner));
+            h.assertTrue(maid.isHomeModeEnable() && maid.isPickup() == pickup,
+                    "Tablet's separate Home handler must accept structure coordinates and apply other settings");
+            h.assertTrue(binding.equals(Homes.id(maid)) && maid.getSchedulePos().getWorkPos().equals(floor),
+                    "Tablet must retain the existing local compass binding");
+        } finally {
+            maid.discard(); owner.setItemInHand(InteractionHand.MAIN_HAND, net.minecraft.world.item.ItemStack.EMPTY);
+            CompatGameTests.cleanup(h, ship);
+        }
+        h.succeed();
+    }
     private static BlockPos anchor(GameTestHelper h, ServerSubLevel s) {
         BlockPos p = s.getPlot().getCenterBlock().offset(3, 1, 3);
         h.getLevel().setBlockAndUpdate(p, InitBlocks.WORK_BLOCK.get().defaultBlockState());

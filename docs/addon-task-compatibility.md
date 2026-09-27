@@ -1,6 +1,6 @@
 # 附属任务与 Sable 兼容
 
-适用：Minecraft 1.21.1、NeoForge 21.1.248、车万女仆 1.5.3、Sable 2.0.5；本模组版本仍为 `0.0.1-beta`。附属模组的精确发布版本见 [编译依赖表](compile-dependencies.md)。
+适用：Minecraft 1.21.1、NeoForge 21.1.248、车万女仆 1.5.3、Sable 2.0.5；本模组版本仍为 `1.0.1-beta`。附属模组的精确发布版本见 [编译依赖表](compile-dependencies.md)。
 
 ## 清单依据
 

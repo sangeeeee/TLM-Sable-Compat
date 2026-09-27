@@ -1,6 +1,6 @@
 # Maid Tavern 与 Sable
 
-适用版本：Maid Tavern `1.2.0`、Kaleidoscope Tavern `1.2.0-neoforge+mc1.21.1`、车万女仆 `1.5.3`、Sable `2.0.5`。本模组版本仍为 `0.0.1-beta`。
+适用版本：Maid Tavern `1.2.0`、Kaleidoscope Tavern `1.2.0-neoforge+mc1.21.1`、车万女仆 `1.5.3`、Sable `2.0.5`。本模组版本仍为 `1.0.1-beta`。
 
 ## 已核对的任务
 

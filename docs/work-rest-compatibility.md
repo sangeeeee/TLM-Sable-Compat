@@ -1,6 +1,6 @@
 # 工作、休闲、休息与通勤
 
-版本固定为 `0.0.1-beta`。实现基于 Minecraft 1.21.1、NeoForge 21.1.248、Touhou Little Maid 1.5.3、Sable 2.0.5；可选曲柄适配使用 MUHC 1.6.2 和 Create 6.0.10。
+版本固定为 `1.0.1-beta`。实现基于 Minecraft 1.21.1、NeoForge 21.1.248、Touhou Little Maid 1.5.3、Sable 2.0.5；可选曲柄适配使用 MUHC 1.6.2 和 Create 6.0.10。
 
 ## 活动空间
 
